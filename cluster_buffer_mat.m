@@ -22,8 +22,8 @@ function cluster_buffer_mat(image_filenumber)
     % loading files
     %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
     %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-    data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-    image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+    data=load(['/rds-d4/user/ww234/hpc-work/itpt/' num2str(image_filenumber) '.mat']);
+    image_path = ['/rds-d4/user/ww234/hpc-work/itpt/' num2str(image_filenumber) '.svs'];
     
     %create indexing
     X_ind = 1;
@@ -31,9 +31,10 @@ function cluster_buffer_mat(image_filenumber)
     cell_ind = 3;
     
     %trim data
-    data_trimmed = data;
-    for i = 1:size(data, 2)
-        data_trimmed{i} = data_trimmed{i}(data{cell_ind}~=0);
+    
+    for i = 1:size(data.data_mini, 2)
+	data_trimmed{i} = data.data_mini(:,i);
+        data_trimmed{i} = data_trimmed{i}(data.data_mini(:,cell_ind)~=0);
     end
 
     % Now remove duplicate points from cell identification tiling
@@ -246,12 +247,13 @@ function cluster_buffer_mat(image_filenumber)
 %         hold on
 %     end
 %     hold(ax, 'off')
-%     
-    %%
-    %now convert each into a polygon
-    for i =1:size(core_list, 2)
+%   
+  %now convert each into a polygon
+empty_cores = [];
+for i =1:size(core_list, 2)
         if isempty(this_cluster_boundary{i}) == 1;
-            continue
+ empty_cores(end+1) = i; %Make a list of empty cores        
+    continue
         end
         this_cluster_boundary{core_list(i)}{1} = this_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_cluster_boundary{core_list(i)}{1}));
         for j = 1:size(this_cluster_boundary{core_list(i)}{1}, 2)
@@ -259,7 +261,8 @@ function cluster_buffer_mat(image_filenumber)
 %             plot(tumour_polygon{core_list(i)}{j});
         end
     end
-    
+core_list(empty_cores) = []; %Remove the empty core from the processing list    
+
     %the end result is tumour_polygon
     
     %%
@@ -345,9 +348,11 @@ function cluster_buffer_mat(image_filenumber)
         density_buffer_combined=[density_buffer_combined density_buffer{core_list(i)}];
     end
     
-    csvwrite([num2str(image_filenumber) '_in.csv'], density_in_combined);
-    csvwrite([num2str(image_filenumber) '_buffer.csv'], density_buffer_combined)
-    
+%    csvwrite([num2str(image_filenumber) '_in.csv'], density_in_combined);
+%    csvwrite([num2str(image_filenumber) '_buffer.csv'], density_buffer_combined)
+    dlmwrite([num2str(image_filenumber) '_in.csv'], density_in_combined, 'precision', 10);
+    dlmwrite([num2str(image_filenumber) '_buffer.csv'], density_buffer_combined, 'precision', 10);
+
     
 %end
 end

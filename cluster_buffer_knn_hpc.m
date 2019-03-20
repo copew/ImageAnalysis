@@ -30,8 +30,8 @@ cluster_size = [5];
 %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
 %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
-data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+data= load(['/rds-d4/user/ww234/hpc-work/itpt/' num2str(image_filenumber) '.mat']);
+image_path = ["/rds-d4/user/ww234/hpc-work/itpt/" num2str(image_filenumber) '.svs'];
 
 %create indexing
 X_ind = 1;

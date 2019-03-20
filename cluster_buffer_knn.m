@@ -26,12 +26,12 @@ for image = 1:size(image_list,2)
     cluster_size = [5];
    
     % loading files
-    data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-    info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-    image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+    %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+    %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
-    %data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-    %image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+    data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
+    image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
     
     %create indexing
     X_ind = 3;

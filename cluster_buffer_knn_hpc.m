@@ -390,6 +390,9 @@ end
 %if buffer and buffer overlap: just carry on as normal
 for i = 1:size(core_list, 2)
     for j = 1:size(tumour_polygon{core_list(i)}, 2)
+        if isempty(tumour_polygon_in{core_list(i)}{j})
+            continue
+        end
         for k = 1:size(tumour_buffer{core_list(i)},2)
             if isempty(tumour_buffer{core_list(i)}{k})
                 continue
@@ -403,17 +406,22 @@ end
 %%
 %calculate area
 for i = 1:size(core_list, 2)
-    for j = 1:size(tumour_polygon{core_list(i)}, 2)
+    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
         tumour_polygon_area{core_list(i)}{j} = area(tumour_polygon_in{core_list(i)}{j});
     end
-    for k = 1:size(tumour_buffer{core_list(i)},2)
+    for k = 1:size(tumour_buffer_in{core_list(i)},2)
         tumour_buffer_area{core_list(i)}{k} = area(tumour_buffer_in{core_list(i)}{k});
     end
 end
 
 %create an output file
 tumour_in_area_combined=horzcat(tumour_polygon_area{:});
+tumour_in_area_combined(cellfun(@isempty, tumour_in_area_combined ) )=[];
 tumour_buffer_area_combined=horzcat(tumour_buffer_area{:});
+tumour_buffer_area_combined(cellfun(@isempty, tumour_buffer_area_combined ) )=[];
+
+
+
 %turn into csv files
 dlmwrite([num2str(image_filenumber) '_area_in.csv'], tumour_in_area_combined, 'precision', 10);
 dlmwrite([num2str(image_filenumber) '_area_buffer.csv'], tumour_buffer_area_combined, 'precision', 10);
@@ -423,14 +431,21 @@ dlmwrite([num2str(image_filenumber) '_area_buffer.csv'], tumour_buffer_area_comb
 %%
 %get the lymphocyte counts as well as tumour cell count
 for i = 1:size(core_list, 2)
-    for j = 1:size(tumour_polygon{core_list(i)}, 2)
+    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
+        if isempty(tumour_polygon_in{core_list(i)}{j})
+            continue
+        end
+        
         lymph_in{core_list(i)}{j}=inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==2), data_trimmed{Y_ind}(data_trimmed{cell_ind}==2), tumour_polygon_in{core_list(i)}{j}.Vertices(:,1), tumour_polygon_in{core_list(i)}{j}.Vertices(:,2));
         lymph_in_count{core_list(i)}{j} = sum(lymph_in{core_list(i)}{j});
         tumourcell_in{core_list(i)}{j}=inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==1), data_trimmed{Y_ind}(data_trimmed{cell_ind}==1), tumour_polygon_in{core_list(i)}{j}.Vertices(:,1), tumour_polygon_in{core_list(i)}{j}.Vertices(:,2));
         tumourcell_in_count{core_list(i)}{j} = sum(tumourcell_in{core_list(i)}{j});
         
     end
-    for k = 1:size(tumour_buffer{core_list(i)},2)
+    for k = 1:size(tumour_buffer_in{core_list(i)},2)
+        if isempty(tumour_buffer_in{core_list(i)}{k})
+            continue
+        end
         lymph_buffer{core_list(i)}{k} = inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==2), data_trimmed{Y_ind}(data_trimmed{cell_ind}==2), tumour_buffer_in{core_list(i)}{k}.Vertices(:,1), tumour_buffer_in{core_list(i)}{k}.Vertices(:,2));
         lymph_buffer_count{core_list(i)}{k} = sum(lymph_buffer{core_list(i)}{k});
         tumourcell_buffer{core_list(i)}{j}=inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==1), data_trimmed{Y_ind}(data_trimmed{cell_ind}==1), tumour_buffer_in{core_list(i)}{j}.Vertices(:,1), tumour_buffer_in{core_list(i)}{j}.Vertices(:,2));
@@ -461,13 +476,13 @@ lymph_in_tumour=cell(0);
 lymph_in_buffer=cell(0);
 
 for i = 1:size(core_list, 2)
-    for j = 1:size(tumour_polygon{core_list(i)}, 2)
+    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
         for k = 1:size(data_trimmed, 2)
             lymph_in_tumour{core_list(i)}{j}{k} = data_trimmed{k}(lymph_in{core_list(i)}{j}, :);
         end
         [lymph_in_distances{core_list(i)}{j}, lymph_in_indexes{core_list(i)}{j}] = pdist2([lymph_in_tumour{core_list(i)}{j}{X_ind} lymph_in_tumour{core_list(i)}{j}{Y_ind}],[lymph_in_tumour{core_list(i)}{j}{X_ind} lymph_in_tumour{core_list(i)}{j}{Y_ind}],'euclidean','Smallest', 51);
     end
-    for m = 1:size(tumour_buffer{core_list(i)}, 2)
+    for m = 1:size(tumour_buffer_in{core_list(i)}, 2)
         for n = 1:size(data_trimmed, 2)
             lymph_in_buffer{core_list(i)}{m}{n} = data_trimmed{n}(lymph_buffer{core_list(i)}{m}, :);
         end

@@ -389,12 +389,12 @@ end
 %if tumour and buffer overlap: treat as tumour
 %if buffer and buffer overlap: just carry on as normal
 for i = 1:size(core_list, 2)
-    for j = 1:size(tumour_polygon{core_list(i)}, 2)
+    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
         if isempty(tumour_polygon_in{core_list(i)}{j})
             continue
         end
-        for k = 1:size(tumour_buffer{core_list(i)},2)
-            if isempty(tumour_buffer{core_list(i)}{k})
+        for k = 1:size(tumour_buffer_in{core_list(i)},2)
+            if isempty(tumour_buffer_in{core_list(i)}{k})
                 continue
             end
             tumour_buffer_in{core_list(i)}{k} = subtract(tumour_buffer_in{core_list(i)}{k}, tumour_polygon_in{core_list(i)}{j});

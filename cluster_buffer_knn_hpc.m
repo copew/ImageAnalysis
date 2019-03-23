@@ -263,7 +263,7 @@ end
 %now convert each into a polygon
 empty_cores = [];
 for i =1:size(core_list, 2)
-    if isempty(this_cluster_boundary{i}) == 1;
+    if isempty(this_cluster_boundary{core_list(i)}) == 1;
         empty_cores(end+1) = i; %Make a list of empty cores  
         continue
     end

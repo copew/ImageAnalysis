@@ -10,7 +10,9 @@
 
     %image_list = [603298,603292,603288,603283,603279,603271,603262,603269,603263,603257,603253,602994,603006,603245,603007,603055,602983,602976,602971, 602962];
 
-image_list=[602983,602935,597786,604094,604089,603941,604066,604055,603966,619896,619859,619799,619954,626172,619571,625946,619550,626171
+image_list=[597786,626171,625946];
+%597786,604094,619859,619799,619571,626172these were run with the extra list
+%[602983,602935,597786,604094,604089,603941,604066,604055,603966,619896,619859,619799,619954,626172,619571,625946,619550,626171];
 %%knn crashed
 
 %%
@@ -262,7 +264,7 @@ for image = 1:size(image_list,2)
     %%
     %now convert each into a polygon
     for i =1:size(core_list, 2)
-        if isempty(this_cluster_boundary{i}) == 1;
+        if isempty(this_cluster_boundary{core_list(i)}) == 1;
             continue
         end
         this_cluster_boundary{core_list(i)}{1} = this_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_cluster_boundary{core_list(i)}{1}));
@@ -436,8 +438,8 @@ for image = 1:size(image_list,2)
             tumourcell_in_count{core_list(i)}{j} = sum(tumourcell_in{core_list(i)}{j});
         
         end
-        for k = 1:size(tumour_buffer{core_list(i)},2)
-            if isempty(tumour_buffer{core_list(i)}{k})
+        for k = 1:size(tumour_buffer_in{core_list(i)},2)
+            if isempty(tumour_buffer_in{core_list(i)}{k})
                     continue
                 end
             lymph_buffer{core_list(i)}{k} = inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==2), data_trimmed{Y_ind}(data_trimmed{cell_ind}==2), tumour_buffer_in{core_list(i)}{k}.Vertices(:,1), tumour_buffer_in{core_list(i)}{k}.Vertices(:,2));

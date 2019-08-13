@@ -14,14 +14,14 @@
 
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
-% image_list=[603288, 593987, 619857, 619872, 619905, 625951];
-image_list=[603288];
+image_list=[603288, 593987, 619857, 619872, 619905, 625951];
+%image_list=[603288];
 
 %% load images and fits files
 %function cluster_buffer_knn(image_filenumber)
 
-%for image = 1:size(image_list,2)
-image=1;
+for image = 1:size(image_list,2)
+%image=1;
 image_filenumber = image_list(image);
 cluster_size = [5];
 lymph_cluster_size = [5];
@@ -164,6 +164,9 @@ end
 
 %% Now compute the tumour and lymphocyte clusters with subsetting
 
+%24th july 2019: changed epsilon to epsilon/2, now works well.  epsilon*3/4 is not very
+%tight, and epsilon/3 is splitting up lymphoid aggregates into very silly small bits.
+%settle with epsilon/2
 
 core_list = [];
 
@@ -293,8 +296,8 @@ for this_core = 1:size(core_polygon,2)
         for this_cell=1:n
             if ~visited(this_cell)
                 visited(this_cell)=true;
-                Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon,this_cell),this_cell)';
-                if numel(Neighbours)<lymph_cutoff_size
+                Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon/2,this_cell),this_cell)';
+                if numel(Neighbours)<this_clustsize
                     % X(i,:) is NOISE
                     isnoise(this_cell)=true;
                 else
@@ -306,7 +309,7 @@ for this_core = 1:size(core_polygon,2)
                         
                         if ~visited(this_neighbour_cell)
                             visited(this_neighbour_cell)=true;
-                            Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon,this_neighbour_cell),this_neighbour_cell)';
+                            Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
                             if numel(Neighbours2)>=this_clustsize
                                 Neighbours=[Neighbours Neighbours2];   %#ok
                             end
@@ -372,7 +375,7 @@ for i = 1:size(this_lymphocyte_cluster_boundary, 2)
 end
 hold(ax, 'off')
 %
-
+end
 
 %% now convert each into a polygon
 for i =1:size(core_list, 2)

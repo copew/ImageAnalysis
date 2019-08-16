@@ -136,9 +136,6 @@ for i = 1:size(this_boundary, 2)
     %plot(core_polygon{i}); %in case the coordinates flipped
 end
 
-%removing large file
-save('large_thumbnail_io', 'large_thumbnail_io');
-clear large_thumbnail_io;
 
 % the useful output of this chunck is the core_polygon cell array
 
@@ -169,8 +166,6 @@ save(['./' num2str(image_filenumber) '/workspace.mat']);
 reload_workspace = 0;
 if reload_workspace
     save('image_filenumber','image_filenumber');
-    save('large_thumbnail_io', 'large_thumbnail_io');
-    clear large_thumbnail_io;
     clear variables;
     load('image_filenumber');
     load(['./' num2str(image_filenumber) '/workspace.mat']);
@@ -363,7 +358,6 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
 figure
 ax=gca();
 hold on;
-load('large_thumbnail_io');
 imshow(large_thumbnail_io);
 hold(ax, 'on');
 % draw the tumour cluster first
@@ -394,27 +388,72 @@ hold(ax, 'off')
 
 
 
+% %% now convert each into a polygon - old code
+% for i =1:size(core_list, 2)
+%             if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
+%                 continue
+%             end
+%             if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1;
+%                 continue
+%             end
+%     this_tumour_cluster_boundary{core_list(i)}{1} = this_tumour_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_tumour_cluster_boundary{core_list(i)}{1}));
+%     this_lymphocyte_cluster_boundary{core_list(i)}{1} = this_lymphocyte_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_lymphocyte_cluster_boundary{core_list(i)}{1}));
+% 
+%     
+%     
+%    % XXXXX addding extra {1} ?? why is this
+%     for j = 1:size(this_tumour_cluster_boundary{core_list(i)}{1}{1}, 2)
+%         tumour_polygon{core_list(i)}{j} = polyshape (this_tumour_cluster_boundary{core_list(i)}{1}{1}{1}{j});
+%         %plot(tumour_polygon{core_list(i)}{j});
+%     end
+%     for j = 1:size(this_lymphocyte_cluster_boundary{core_list(i)}{1}, 2)
+%         lymphocyte_polygon{core_list(i)}{j} = polyshape (this_lymphocyte_cluster_boundary{core_list(i)}{1}{j});
+%         %plot(tumour_polygon{core_list(i)}{j});
+%     end
+% end
 %% now convert each into a polygon
-for i =1:size(core_list, 2)
-            if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
-                continue
-            end
-            if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1;
-                continue
-            end
-    this_tumour_cluster_boundary{core_list(i)}{1} = this_tumour_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_tumour_cluster_boundary{core_list(i)}{1}));
-    this_lymphocyte_cluster_boundary{core_list(i)}{1} = this_lymphocyte_cluster_boundary{core_list(i)}{1}(~cellfun('isempty', this_lymphocyte_cluster_boundary{core_list(i)}{1}));
-
+for i =1:size(core_list, 2) %First un-nest the cells
+    this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+    this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
+end
+%Then get rid of empty cells from the array. Note that this then makes the
+%core_list not suitable for indexing through. Can't remove items from the
+%core list because there might be some tumours empty with lymphocytes
+%present etc.,
+tumour_core_list = core_list(~cellfun('isempty',this_tumour_cluster_boundary)); %In case you need this later
+this_tumour_cluster_boundary = this_tumour_cluster_boundary(~cellfun('isempty',this_tumour_cluster_boundary));
+lymphocyte_core_list = core_list(~cellfun('isempty',this_lymphocyte_cluster_boundary)); %In case you need this later
+this_lymphocyte_cluster_boundary = this_lymphocyte_cluster_boundary(~cellfun('isempty',this_lymphocyte_cluster_boundary));
     
-    
-   % XXXXX addding extra {1} ?? why is this
-    for j = 1:size(this_tumour_cluster_boundary{core_list(i)}{1}{1}, 2)
-        tumour_polygon{core_list(i)}{j} = polyshape(this_tumour_cluster_boundary{core_list(i)}{1}{1}{1}{j});
-        %plot(tumour_polygon{core_list(i)}{j});
+for i =1:size(this_tumour_cluster_boundary,2)
+    for j = 1:size(this_tumour_cluster_boundary{i}, 2)
+        try
+            warning('off','all')
+            tumour_polygon{i}{j} = polyshape(this_tumour_cluster_boundary{i}{j});
+            warning('on','all')
+        catch
+            warning('on','all')
+            warning(['Something went wrong with tumour polygons for core ' num2str(tumour_core_list(i)) ' moving on, the array is:'])
+            disp(this_tumour_cluster_boundary{i}{j})
+            continue
+        end
+        %plot(tumour_polygon{i}{j});
     end
-    for j = 1:size(this_lymphocyte_cluster_boundary{core_list(i)}{1}, 2)
-        lymphocyte_polygon{core_list(i)}{j} = polyshape(this_lymphocyte_cluster_boundary{core_list(i)}{1}{j});
-        %plot(tumour_polygon{core_list(i)}{j});
+end
+
+for i =1:size(this_lymphocyte_cluster_boundary,2)
+    for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
+        try
+            warning('off','all')
+            lymphocyte_polygon{i}{j} = polyshape(this_lymphocyte_cluster_boundary{i}{j});
+            warning('on','all')
+        catch
+            warning('on','all')
+            warning(['Something went wrong with lymphocyte polygons for core ' num2str(lymphocyte_core_list(i)) ' moving on, the array is:'])
+            disp(this_lymphocyte_cluster_boundary{i}{j})
+            continue
+        end
+        %plot(lymphocyte_polygon{i}{j});
     end
 end
 

@@ -15,9 +15,8 @@
 %% load images and fits files
 
 function tum_lymph_cluster_hpc(image_filenumber)
-
 %for image = 1:size(image_list,2)
-%image_filenumber = image_list(image);
+image_filenumber = image_list(image);
 
 % set parameters
 cluster_size = [5];
@@ -183,9 +182,9 @@ for this_core = 1:size(core_polygon,2)
             neighbour_cells = in_core{this_core}{cell_ind}==1;
     
             %ignore the really small chunks that has very few tumour cells
-            if size(in_core{this_core}{cell_ind}==1,1) < 10
-                continue
-            end
+%             if size(in_core{this_core}{cell_ind}==1,1) < 10
+%                 continue
+%             end
     
             [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', cluster_size+1);
     
@@ -357,6 +356,8 @@ imshow(large_thumbnail_io);
 hold(ax, 'on');
 % draw the tumour cluster first
     for i = 1:size(this_tumour_cluster_boundary, 2)
+       
+        i=3
         if isempty(this_tumour_cluster_boundary{i}) == 1
             continue
         end
@@ -416,19 +417,22 @@ for i =1:size(core_list, 2)
     if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
         continue
     end
-    if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1;
-        continue
-    end
-
+    
     for j = 1:size(this_tumour_cluster_boundary{core_list(i)}, 2)
-        if isempty(this_tumour_cluster_boundary{i}{j}) == 1
+        if isempty(this_tumour_cluster_boundary{core_list(i)}{j}) == 1
             continue
         end
         tumour_polygon{core_list(i)}{j} = polyshape (this_tumour_cluster_boundary{core_list(i)}{j});
         %plot(tumour_polygon{core_list(i)}{j});
     end
+end
+    
+for i =1:size(core_list, 2)    
+    if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1;
+        continue
+    end
     for k = 1:size(this_lymphocyte_cluster_boundary{core_list(i)}, 2)
-        if isempty(this_lymphocyte_cluster_boundary{i}{k}) == 1
+        if isempty(this_lymphocyte_cluster_boundary{core_list(i)}{k}) == 1
             continue
         end
         lymphocyte_polygon{core_list(i)}{k} = polyshape (this_lymphocyte_cluster_boundary{core_list(i)}{k});
@@ -449,9 +453,11 @@ end
 % % %core_list not suitable for indexing through. Can't remove items from the
 % % %core list because there might be some tumours empty with lymphocytes
 % % %present etc.,
-tumour_core_list = core_list(~cellfun('isempty',this_tumour_cluster_boundary)); %In case you need this later
+total_core_polygon = 1:size(this_tumour_cluster_boundary, 2);
+
+tumour_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_tumour_cluster_boundary))); %In case you need this later
 % %this_tumour_cluster_boundary = this_tumour_cluster_boundary(~cellfun('isempty',this_tumour_cluster_boundary));
-lymphocyte_core_list = core_list(~cellfun('isempty',this_lymphocyte_cluster_boundary)); %In case you need this later
+lymphocyte_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_lymphocyte_cluster_boundary))); %In case you need this later
 % %this_lymphocyte_cluster_boundary = this_lymphocyte_cluster_boundary(~cellfun('isempty',this_lymphocyte_cluster_boundary));
 %     
 % for i =1:size(this_tumour_cluster_boundary,2)
@@ -504,7 +510,7 @@ for i =1:size(tumour_polygon, 2)
                 continue
             end
             overlap{i}{j}{k} = inpolygon(tumour_polygon{i}{k}.Vertices(:,1), tumour_polygon{i}{k}.Vertices(:,2), tumour_polygon{i}{j}.Vertices(:,1), tumour_polygon{i}{j}.Vertices(:,2));
-            if sum(overlap{core_list(i)}{j}{k})>0
+            if sum(overlap{i}{j}{k})>0
                 tumour_polygon{i}{j} = union(tumour_polygon{i}{j}, tumour_polygon{i}{k});
                 tumour_polygon{i}{k} = [];
             else
@@ -593,10 +599,10 @@ for i = 1:size(core_list, 2)
         continue
     end
     for k = 1:size(tumour_buffer{core_list(i)},2)
-        if isempty(tumour_buffer{i}{k})
+        if isempty(tumour_buffer{core_list(i)}{k})
             continue
         end
-        tumour_buffer_in{i}{k} = intersect(tumour_buffer{i}{k}, core_polygon{core_list(i)});
+        tumour_buffer_in{core_list(i)}{k} = intersect(tumour_buffer{core_list(i)}{k}, core_polygon{core_list(i)});
     end
 end
 
@@ -672,16 +678,16 @@ for i = 1:size(core_list, 2)
     %core area
     core_area{core_list(i)} = area(core_polygon{i});
     %tumour polygon area
-    for j = 1:size(tumour_polygon_in{i}, 2)
-        tumour_polygon_area{i}{j} = area(tumour_polygon_in{i}{j});
+    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
+        tumour_polygon_area{core_list(i)}{j} = area(tumour_polygon_in{core_list(i)}{j});
     end
     %tumour buffer zone area
-    for k = 1:size(tumour_buffer_in{i},2)
-        tumour_buffer_area{i}{k} = area(tumour_buffer_in{i}{k});
+    for k = 1:size(tumour_buffer_in{core_list(i)},2)
+        tumour_buffer_area{core_list(i)}{k} = area(tumour_buffer_in{core_list(i)}{k});
     end
     %lymphocyte cluster area
-    for l = 1:size(lymphocyte_polygon{i}, 2)
-        lymphocyte_polygon_area{i}{l} = area(lymphocyte_polygon{i}{l});
+    for l = 1:size(lymphocyte_polygon{core_list(i)}, 2)
+        lymphocyte_polygon_area{core_list(i)}{l} = area(lymphocyte_polygon{core_list(i)}{l});
     end 
 end
 

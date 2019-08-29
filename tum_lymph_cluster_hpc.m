@@ -77,7 +77,7 @@ data_trimmed = data;
 %end
 
 % and combine tumour and normal
-data_trimmed{cell_ind}(data_trimmed{cell_ind} == 4) = 1;
+%data_trimmed{cell_ind}(data_trimmed{cell_ind} == 4) = 1;
 
 
 %% Create a boundary around each core

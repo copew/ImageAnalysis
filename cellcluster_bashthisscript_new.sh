@@ -1,6 +1,6 @@
 #!/bin/bash
 
-myscriptdir=/home/ww234/cellclusterslurm
+myscriptdir=/rds/user/ww234/hpc-work/ImageAnalysis
 myfilesdir=/rds/user/ww234/hpc-work/itpt
 
 submit=${myscriptdir}/cellcluster_submit.sh
@@ -13,6 +13,6 @@ images=${myscriptdir}/testfiles.txt #! For debug
 mkdir outputfiles_tum_lymph
 cd outputfiles_tum_lymph
 while read line ; do sbatch ${submit} ${prepare} ${func} "${myfilesdir}/${line}.fits" ; done<${images}
-#! while read line ; do echo ${submit} ${prepare} ${func} "${myfilesdir}/${line}.fits" ; done<${images} #!For debug
+while read line ; do echo ${submit} ${prepare} ${func} "${myfilesdir}/${line}.fits" ; done<${images} #!For debug
 
 cd ..

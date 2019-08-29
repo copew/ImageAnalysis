@@ -14,9 +14,10 @@
 
 %% load images and fits files
 
-function tum_lymph_cluster_hpc(image_filenumber)
-%for image = 1:size(image_list,2)
-image_filenumber = image_list(image);
+function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+image_filenumber = extractBetween(image_filenumber_fullpath, 31,36)
+% for image = 1:size(image_list,2)
+% image_filenumber = image_list(image);
 
 % set parameters
 cluster_size = [5];
@@ -27,12 +28,12 @@ lymph_cutoff_size = [50];
 mkdir(num2str(image_filenumber));
 
 % loading files
-data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+%data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+%info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
-%data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-%image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
+image_path = ['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.svs'];
 
 %create indexing
 X_ind = 3;

@@ -15,9 +15,15 @@
 %% load images and fits files
 
 function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-if isstring(image_filenumber_fullpath)
+disp(image_filenumber_fullpath)
+disp(class(image_filenumber_fullpath))
+if ischar(image_filenumber_fullpath)
 [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
 image_filenumber = str2num(image_filenumber);
+if isempty(image_path_stem)
+image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+end
 elseif isnumeric(image_filenumber_fullpath)
 image_filenumber = image_filenumber_fullpath;
 image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'

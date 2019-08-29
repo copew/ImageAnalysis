@@ -24,9 +24,9 @@ addpath(pa);
 disp(['Path is ' pa])
 disp(['Function is ' af])
 % disp([af,'(''','${ref}',''')']) %For submitting as string
-% dofunc=sprintf('%s(''%s'')',af,'${ref}')
+dofunc=sprintf('%s(''%s'')',af,'${ref}')
 
-dofunc=sprintf('%s(%s)',af,'${ref}')
+% dofunc=sprintf('%s(%s)',af,'${ref}')
 
 eval(dofunc)
 ;exit

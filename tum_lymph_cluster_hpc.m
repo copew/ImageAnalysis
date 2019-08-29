@@ -15,7 +15,15 @@
 %% load images and fits files
 
 function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-image_filenumber = extractBetween(image_filenumber_fullpath, 31,36)
+if isstring(image_filenumber_fullpath)
+[image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+image_filenumber = str2num(image_filenumber);
+elseif isnumeric(image_filenumber_fullpath)
+image_filenumber = image_filenumber_fullpath;
+image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+end
+
 % for image = 1:size(image_list,2)
 % image_filenumber = image_list(image);
 
@@ -32,8 +40,8 @@ mkdir(num2str(image_filenumber));
 %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
 %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
-data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-image_path = ['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.svs'];
+data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %create indexing
 X_ind = 3;

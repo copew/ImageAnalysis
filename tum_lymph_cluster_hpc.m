@@ -50,11 +50,11 @@ data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
 image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %create indexing
-X_ind = 3;
-Y_ind = 4;
-overlap = 22;
-s2n=61;
-cell_ind = 62;
+X_ind = 1;
+Y_ind = 2;
+% overlap = 22;
+% s2n=61;
+cell_ind = 3;
 
 %% tidying up data
 
@@ -62,19 +62,19 @@ cell_ind = 62;
 data_trimmed = data;
 
 %remove non cells
-for i = 1:size(data, 2)
-    data_trimmed{i} = data_trimmed{i}(data{cell_ind}~=0);
-end
+%for i = 1:size(data, 2)
+%    data_trimmed{i} = data_trimmed{i}(data{cell_ind}~=0);
+%end
 %remove overlaps
-data_tmp = data_trimmed;
-for i = 1:size(data_trimmed, 2)
-    data_trimmed{i} = data_trimmed{i}(data_tmp{overlap} =='F');
-end
-%remove low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush)
-data_tmp = data_trimmed;
-for i = 1:size(data_trimmed, 2)
-    data_trimmed{i} = data_trimmed{i}(data_tmp{s2n} >= 1.3);
-end
+%data_tmp = data_trimmed;
+%for i = 1:size(data_trimmed, 2)
+%    data_trimmed{i} = data_trimmed{i}(data_tmp{overlap} =='F');
+%end
+%%remove low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush)
+%data_tmp = data_trimmed;
+%for i = 1:size(data_trimmed, 2)
+%    data_trimmed{i} = data_trimmed{i}(data_tmp{s2n} >= 1.3);
+%end
 
 % and combine tumour and normal
 data_trimmed{cell_ind}(data_trimmed{cell_ind} == 4) = 1;

@@ -59,7 +59,7 @@ cell_ind = 3;
 %% tidying up data
 
 %trim data
-data_trimmed = data;
+data_trimmed = data.data_mini;
 
 %remove non cells
 %for i = 1:size(data, 2)

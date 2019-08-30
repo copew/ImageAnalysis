@@ -6,32 +6,36 @@
 %,603288, 603298,603292
 
 
+%this is just to debug so all the paths are linked to a local folder
 
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
-% image_list=[603288, 593987, 619857, 619872, 619905, 625951];
-%image_list=[603288];
+%image_list=[603288, 593987, 619857, 619872, 619905, 625951];
+image_list=[603288];
+
+image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
+%image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
 
 %% load images and fits files
 
-function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-disp(image_filenumber_fullpath)
-disp(class(image_filenumber_fullpath))
-if ischar(image_filenumber_fullpath)
-[image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-image_filenumber = str2num(image_filenumber);
-if isempty(image_path_stem)
-image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
-elseif isnumeric(image_filenumber_fullpath)
-image_filenumber = image_filenumber_fullpath;
-image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
+%function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+% disp(image_filenumber_fullpath)
+% disp(class(image_filenumber_fullpath))
+% if ischar(image_filenumber_fullpath)
+%[image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+%image_filenumber = str2num(image_filenumber);
+% if isempty(image_path_stem)
+% image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% end
+% elseif isnumeric(image_filenumber_fullpath)
+% image_filenumber = image_filenumber_fullpath;
+% image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% end
 
-% for image = 1:size(image_list,2)
-% image_filenumber = image_list(image);
+for image = 1:size(image_list,2)
+image_filenumber = image_list(image);
 
 % set parameters
 cluster_size = [5];
@@ -44,10 +48,10 @@ mkdir(num2str(image_filenumber));
 % loading files
 %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
 %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
 data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+%image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %create indexing
 X_ind = 1;
@@ -60,7 +64,9 @@ cell_ind = 3;
 
 %trim data
 data_trimmed = data.data_mini;
-data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
+
+%this bit is added on 30th aug for debug
+data_trimmed = num2cell(data_trimmed, 1);
 
 %remove non cells
 %for i = 1:size(data, 2)

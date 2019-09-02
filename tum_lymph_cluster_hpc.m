@@ -423,7 +423,16 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
 % %first, then some times it has extra layers before reaches the collection of number for
 % %the clusters. so will unnest within each core
 for i =1:size(core_list, 2) %First un-nest the cells
+    if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
+        continue
+    end
     this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+end
+
+for i =1:size(core_list, 2)
+    if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) ==1;
+        continue
+    end
     this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
 end
 

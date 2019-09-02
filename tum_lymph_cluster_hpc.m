@@ -365,58 +365,57 @@ end
 save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
 
 %% this is to check if the clusters are correct
-figure
-ax=gca();
-hold on;
-imshow(large_thumbnail_io);
-hold(ax, 'on');
-% draw the tumour cluster first
-    for i = 1:size(this_tumour_cluster_boundary, 2)
-       
-        i=3
-        if isempty(this_tumour_cluster_boundary{i}) == 1
-            continue
-        end
-        if isempty(this_tumour_cluster_boundary{i}{1}) == 1
-            continue
-        end
-
-        % this_tumour_cluster_boundary{i}{1} =
-        % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
-        % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
-        % unnecessarily
-        for j = 1:size(this_tumour_cluster_boundary{i}{1}, 2)
-            hold on;
-            if isempty(this_tumour_cluster_boundary{i}{1}{j}) == 1
-                continue
-            end
-            plot(this_tumour_cluster_boundary{i}{1}{j}(:,1), this_tumour_cluster_boundary{i}{1}{j}(:,2), 'k-');
-        end
-        hold on;
-    end
-    
-% now draw the lymphocyte cluster
-for i = 1:size(this_lymphocyte_cluster_boundary, 2)
-    if isempty(this_lymphocyte_cluster_boundary{i}) == 1
-        continue
-    end
-    if isempty(this_lymphocyte_cluster_boundary{i}{1}) == 1
-        continue
-    end
-    %this_lymphocyte_cluster_boundary{i}{1} =
-    %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
-    %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
-    %unnecesarily
-    for j = 1:size(this_lymphocyte_cluster_boundary{i}{1}, 2)
-        hold on;
-        if isempty(this_lymphocyte_cluster_boundary{i}{1}{j}) == 1
-            continue
-        end
-        plot(this_lymphocyte_cluster_boundary{i}{1}{j}(:,1), this_lymphocyte_cluster_boundary{i}{1}{j}(:,2), 'r-');
-    end
-    hold on;
-end
-hold(ax, 'off')
+% figure
+% ax=gca();
+% hold on;
+% imshow(large_thumbnail_io);
+% hold(ax, 'on');
+% % draw the tumour cluster first
+%     for i = 1:size(this_tumour_cluster_boundary, 2)
+%       
+%         if isempty(this_tumour_cluster_boundary{i}) == 1
+%             continue
+%         end
+%         if isempty(this_tumour_cluster_boundary{i}{1}) == 1
+%             continue
+%         end
+% 
+%         % this_tumour_cluster_boundary{i}{1} =
+%         % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
+%         % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
+%         % unnecessarily
+%         for j = 1:size(this_tumour_cluster_boundary{i}{1}, 2)
+%             hold on;
+%             if isempty(this_tumour_cluster_boundary{i}{1}{j}) == 1
+%                 continue
+%             end
+%             plot(this_tumour_cluster_boundary{i}{1}{j}(:,1), this_tumour_cluster_boundary{i}{1}{j}(:,2), 'k-');
+%         end
+%         hold on;
+%     end
+%     
+% % now draw the lymphocyte cluster
+% for i = 1:size(this_lymphocyte_cluster_boundary, 2)
+%     if isempty(this_lymphocyte_cluster_boundary{i}) == 1
+%         continue
+%     end
+%     if isempty(this_lymphocyte_cluster_boundary{i}{1}) == 1
+%         continue
+%     end
+%     %this_lymphocyte_cluster_boundary{i}{1} =
+%     %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
+%     %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
+%     %unnecesarily
+%     for j = 1:size(this_lymphocyte_cluster_boundary{i}{1}, 2)
+%         hold on;
+%         if isempty(this_lymphocyte_cluster_boundary{i}{1}{j}) == 1
+%             continue
+%         end
+%         plot(this_lymphocyte_cluster_boundary{i}{1}{j}(:,1), this_lymphocyte_cluster_boundary{i}{1}{j}(:,2), 'r-');
+%     end
+%     hold on;
+% end
+% hold(ax, 'off')
 
 
 %% now convert each into a polygon - old code

@@ -8,10 +8,14 @@
 
 %this is just to debug so all the paths are linked to a local folder
 
+%2nd sep 2019 debugging errors from hpc output
+
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
 %image_list=[603288, 593987, 619857, 619872, 619905, 625951];
-image_list=[603288];
+% image_list=[626172]; %626162 is not done yet - probably memory issue and caused matlab to crash last time %597786, 
+image_list = [594017];
+
 
 image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
 %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';

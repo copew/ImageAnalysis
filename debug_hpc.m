@@ -15,7 +15,7 @@
 %image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 % image_list=[626172]; %626162 is not done yet - probably memory issue and caused matlab to crash last time %597786, 
 
-image_list = [594017]; 
+image_list = [603966]; 
 
 image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
 %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
@@ -144,7 +144,7 @@ end
 %     figure % Plot the results for sanity
 %     imshow(large_thumbnail_io)
 %     hold on;
-%
+% 
 %     %for i = 1:size(grain,2)
 %         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
 %     %end
@@ -175,7 +175,7 @@ end
 % hold on;
 % for i = 1:size(core_polygon, 2)
 %     plot(in_core{i}{X_ind}(in_core{i}{cell_ind}==1), in_core{i}{Y_ind}(in_core{i}{cell_ind}==1), 'b.')
-%       % in case the cells are in the wrong place
+%       in case the cells are in the wrong place
 % end
 
 %save(['./' num2str(image_filenumber) '/workspace1.mat']);
@@ -399,7 +399,11 @@ hold(ax, 'on');
             if isempty(this_tumour_cluster_boundary{i}{j}) == 1
                 continue
             end
-            plot(this_tumour_cluster_boundary{i}{j}(:,1), this_tumour_cluster_boundary{i}{j}(:,2), 'k-');
+            % XXXXXXX this is where the error is. nee dto reconsider structure of the
+            % this_tumour_cluster_boudnary cell array. somehow it's got an extra layer of
+            % nest than previously thought? need to run it with one that didn't break and
+            % see what is the problem. XXXXXXXX
+            %plot(this_tumour_cluster_boundary{i}{j}(:,1), this_tumour_cluster_boundary{i}{j}(:,2), 'k-');
         end
         hold on;
     end

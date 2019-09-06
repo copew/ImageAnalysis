@@ -10,12 +10,17 @@
 
 %2nd sep 2019 debugging errors from hpc output
 
+%6th sep 2019: debugging, the latest one of two and two fo two isnt' working as it's using
+%variable that hasn't been defined yet. might need to stretech the result dimension to
+%make sure there are enough empty cells at the end XXXXXXXXXXX
+
+
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
 %image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 % image_list=[626172]; %626162 is not done yet - probably memory issue and caused matlab to crash last time %597786, 
 
-image_list = [594000]; 
+image_list = [626172]; 
 
 image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
 %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
@@ -217,6 +222,7 @@ for this_core = 1:size(core_polygon,2)
             i = 0;
             if size(all_multi_real_distances{this_core},1)<max(cluster_size)+1
                 all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(cluster_size)+1,:)=NaN;
+                this_tumour_cluster_boundary{this_core} == []; % this is the latest change one out of two
                 continue;
             end
     
@@ -301,6 +307,7 @@ for this_core = 1:size(core_polygon,2)
     i = 0;
     if size(all_multi_real_distances{this_core},1)<max(lymph_cluster_size)+1
         all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(lymph_cluster_size)+1,:)=NaN;
+        this_lymphocyte_cluster_boundary{this_core} == []; % this is the latest change two out of two
         continue;
     end
     

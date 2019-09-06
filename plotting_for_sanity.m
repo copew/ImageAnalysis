@@ -74,6 +74,7 @@ for i = 1:size(lymphocyte_polygon, 2)
 end
 hold(ax, 'off')
 
+clearvars -except image_list
 %
 end
 

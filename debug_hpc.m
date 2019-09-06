@@ -15,7 +15,7 @@
 %image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 % image_list=[626172]; %626162 is not done yet - probably memory issue and caused matlab to crash last time %597786, 
 
-image_list = [603966]; 
+image_list = [594000]; 
 
 image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
 %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/MATLAB/ImageAnalysis/mat_file_new';
@@ -394,16 +394,16 @@ hold(ax, 'on');
         % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
         % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
         % unnecessarily
-        for j = 1:size(this_tumour_cluster_boundary{i}, 2)
+        for j = 1:size(this_tumour_cluster_boundary{i}{1}, 2)
             hold on;
-            if isempty(this_tumour_cluster_boundary{i}{j}) == 1
+            if isempty(this_tumour_cluster_boundary{i}{1}{j}) == 1
                 continue
             end
             % XXXXXXX this is where the error is. nee dto reconsider structure of the
             % this_tumour_cluster_boudnary cell array. somehow it's got an extra layer of
             % nest than previously thought? need to run it with one that didn't break and
             % see what is the problem. XXXXXXXX
-            %plot(this_tumour_cluster_boundary{i}{j}(:,1), this_tumour_cluster_boundary{i}{j}(:,2), 'k-');
+            plot(this_tumour_cluster_boundary{i}{1}{j}(:,1), this_tumour_cluster_boundary{i}{1}{j}(:,2), 'k-');
         end
         hold on;
     end
@@ -420,12 +420,12 @@ for i = 1:size(this_lymphocyte_cluster_boundary, 2)
     %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
     %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
     %unnecesarily
-    for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
+    for j = 1:size(this_lymphocyte_cluster_boundary{i}{1}, 2)
         hold on;
-        if isempty(this_lymphocyte_cluster_boundary{i}{j}) == 1
+        if isempty(this_lymphocyte_cluster_boundary{i}{1}{j}) == 1
             continue
         end
-        plot(this_lymphocyte_cluster_boundary{i}{j}(:,1), this_lymphocyte_cluster_boundary{i}{j}(:,2), 'r-');
+        plot(this_lymphocyte_cluster_boundary{i}{1}{j}(:,1), this_lymphocyte_cluster_boundary{i}{1}{j}(:,2), 'r-');
     end
     hold on;
 end

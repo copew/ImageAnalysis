@@ -389,7 +389,6 @@ tumour_core_total = size(this_tumour_cluster_boundary, 2);
 lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
 core_total = max(core_list);
 
-%XXXXX currently working on this
 % if same sizes then dont' worry about it....
 if core_total == tumour_core_total
     %do nothing
@@ -408,9 +407,6 @@ if core_total == lymph_core_total
         this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
     end
 end
-
-
-
 
 
 % save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);

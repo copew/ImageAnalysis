@@ -207,6 +207,7 @@ for this_core = 1:size(core_polygon,2)
             i = 0;
             if size(all_multi_real_distances{this_core},1)<max(cluster_size)+1
                 all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(cluster_size)+1,:)=NaN;
+                this_tumour_cluster_boundary{this_core} = [];
                 continue;
             end
     
@@ -291,6 +292,7 @@ for this_core = 1:size(core_polygon,2)
     i = 0;
     if size(all_multi_real_distances{this_core},1)<max(lymph_cluster_size)+1
         all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(lymph_cluster_size)+1,:)=NaN;
+        this_lymphocyte_cluster_boundary{this_core} = [];
         continue;
     end
     
@@ -729,20 +731,23 @@ csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_interse
 
 %%
 %calculate area
-for i = 1:size(core_list, 2)
+for i = 1:size(tumour_core_list, 2)
     %core area
-    core_area{core_list(i)} = area(core_polygon{i});
+    core_area{tumour_core_list(i)} = area(core_polygon{i});
     %tumour polygon area
-    for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
-        tumour_polygon_area{core_list(i)}{j} = area(tumour_polygon_in{core_list(i)}{j});
+    for j = 1:size(tumour_polygon_in{tumour_core_list(i)}, 2)
+        tumour_polygon_area{tumour_core_list(i)}{j} = area(tumour_polygon_in{tumour_core_list(i)}{j});
     end
     %tumour buffer zone area
-    for k = 1:size(tumour_buffer_in{core_list(i)},2)
-        tumour_buffer_area{core_list(i)}{k} = area(tumour_buffer_in{core_list(i)}{k});
+    for k = 1:size(tumour_buffer_in{tumour_core_list(i)},2)
+        tumour_buffer_area{tumour_core_list(i)}{k} = area(tumour_buffer_in{tumour_core_list(i)}{k});
     end
-    %lymphocyte cluster area
-    for l = 1:size(lymphocyte_polygon{core_list(i)}, 2)
-        lymphocyte_polygon_area{core_list(i)}{l} = area(lymphocyte_polygon{core_list(i)}{l});
+end   
+
+%lymphocyte cluster area
+for i = 1:size(lymphocyte_core_list, 2)
+    for l = 1:size(lymphocyte_polygon{lymphocyte_core_list(i)}, 2)
+        lymphocyte_polygon_area{lymphocyte_core_list(i)}{l} = area(lymphocyte_polygon{(i)}{l});
     end 
 end
 

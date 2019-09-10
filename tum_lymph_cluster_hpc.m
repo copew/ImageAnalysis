@@ -644,7 +644,7 @@ end
 %% exclude the area that falls outside the cores
 %intersecting regions so only within core area is calculated
 % 
-for i = 1:size(core_list, 2)
+for i = 1:size(tumour_core_list, 2)
 %     for j = 1:size(tumour_polygon{i}, 2)
 %         if isempty(tumour_polygon{i}{j})
 %             continue
@@ -652,14 +652,14 @@ for i = 1:size(core_list, 2)
 %         tumour_polygon_in{i}{j} = intersect(tumour_polygon{i}{j}, core_polygon{tumour_core_list(i)});
 %     end
 % the above is unnecessary as only the buffer goes outside
-    if isempty(tumour_buffer{core_list(i)})
+    if isempty(tumour_buffer{tumour_core_list(i)})
         continue
     end
-    for k = 1:size(tumour_buffer{core_list(i)},2)
-        if isempty(tumour_buffer{core_list(i)}{k})
+    for k = 1:size(tumour_buffer{tumour_core_list(i)},2)
+        if isempty(tumour_buffer{tumour_core_list(i)}{k})
             continue
         end
-        tumour_buffer_in{core_list(i)}{k} = intersect(tumour_buffer{core_list(i)}{k}, core_polygon{core_list(i)});
+        tumour_buffer_in{tumour_core_list(i)}{k} = intersect(tumour_buffer{tumour_core_list(i)}{k}, core_polygon{tumour_core_list(i)});
     end
 end
 

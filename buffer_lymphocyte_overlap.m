@@ -92,85 +92,85 @@ for image = 1:size(image_list,2)
     
 end
 
-% %% This bit is to fix a problem caused by forgotten to rename the file....
-% 
-% % XXX still need to redo the image_list
-% 
-% image_list = [603283,603279,603262,603269,603263,603257,603006,603245,603007,603055,602983,602976,602971,602962,602952,602958,602966,602945];
+%% This bit is to fix a problem caused by forgotten to rename the file....
+
+% XXX still need to redo the image_list
+
+image_list = [603283,603279,603262,603269,603263,603257,603006,603245,603007,603055,602983,602976,602971,602962,602952,602958,602966,602945];
  
-% src_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/outputfiles_tum_lymph';
-% output_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap';
-% 
-% X_ind = 1;
-% Y_ind = 2;
-% cell_ind = 3;
-% 
-% 
-% for image = 1:size(image_list,2)
-%     image_filenumber = image_list(image);
-%     
-%     load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_polygon.mat']);
-%     load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_in.mat']);
-%     load(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis/mat_file/' num2str(image_filenumber) '.mat']);
-%     data_mini = num2cell(data_mini, 3);
-%     if size(lymphocyte_polygon, 2) ~= size(tumour_in, 2)
-%         warning(['the lymphocyte and tumour polygons have different number of cores ', num2str(image_filenumber)]);
-%     end
-%     
-%     tumour_core_total = size(tumour_in, 2);
-%     lymph_core_total = size(lymphocyte_polygon, 2);
-%     
-%     % if same sizes then dont' worry about it....
-%     if lymph_core_total == tumour_core_total
-%         %do nothing
-%     else
-%         diff = lymph_core_total - tumour_core_total;
-%         if diff > 0
-%             for d = 1:diff
-%                 tumour_in{1, tumour_core_total+d} = [];
-%                 
-%                 
-%             end
-%         else
-%             for d = 1:abs(diff)
-%                 lymphocyte_polygon{1, lymph_core_total+d} = [];
-%             end
-%         end
-%     end
-%     
-%     t_l_intersection = [];
-%     
-%     for i=1:size(tumour_in, 2) %looking at the cores with tumours
-%         t_l_intersection{i}=[];
-%         t_l_intersection_area{i}=[];
-%         t_l_intersection_lymph_count{i} = [];
-%         
-%         for j=1:size(tumour_in{i}, 2)
-%             if isempty(tumour_in{i}{j})
-%                 continue
-%             end
-%             for k = 1:size(lymphocyte_polygon{i}, 2)
-%                 if isempty(lymphocyte_polygon{i}{k})
-%                     continue
-%                 end
-%                 tmp = intersect(tumour_in{i}{j}, lymphocyte_polygon{i}{k});
-%                 if tmp.NumRegions == 0
-%                     continue
-%                 end
-%                 tmp_lymph = inpolygon(data_mini{X_ind}(data_mini{cell_ind}==2), data_mini{Y_ind}(data_mini{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
-%                 tmp_lymph_count = sum(tmp_lymph);
-%                 t_l_intersection{i} = [t_l_intersection{i} tmp];
-%                 t_l_intersection_area{i} = [t_l_intersection_area{i} area(tmp)];
-%                 t_l_intersection_lymph_count{i} = [t_l_intersection_lymph_count{i} tmp_lymph_count];
-%             end
-%         end
-%     end
-%     
-%     save([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection.mat'], 't_l_intersection');
-%     csvwrite([output_dir '/count/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);
-%     csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);%saving in both locations
-%     csvwrite([output_dir '/area/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
-%     csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
-% 
-%     
-% end
+src_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/outputfiles_tum_lymph';
+output_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap';
+
+X_ind = 1;
+Y_ind = 2;
+cell_ind = 3;
+
+
+for image = 1:size(image_list,2)
+    image_filenumber = image_list(image);
+    
+    load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_polygon.mat']);
+    load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_polygon_in.mat']);
+    load(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis/mat_file/' num2str(image_filenumber) '.mat']);
+    data_mini = num2cell(data_mini, 3);
+    if size(lymphocyte_polygon, 2) ~= size(tumour_polygon_in, 2)
+        warning(['the lymphocyte and tumour polygons have different number of cores ', num2str(image_filenumber)]);
+    end
+    
+    tumour_core_total = size(tumour_polygon_in, 2);
+    lymph_core_total = size(lymphocyte_polygon, 2);
+    
+    % if same sizes then dont' worry about it....
+    if lymph_core_total == tumour_core_total
+        %do nothing
+    else
+        diff = lymph_core_total - tumour_core_total;
+        if diff > 0
+            for d = 1:diff
+                tumour_polygon_in{1, tumour_core_total+d} = [];
+                
+                
+            end
+        else
+            for d = 1:abs(diff)
+                lymphocyte_polygon{1, lymph_core_total+d} = [];
+            end
+        end
+    end
+    
+    t_l_intersection = [];
+    
+    for i=1:size(tumour_polygon_in, 2) %looking at the cores with tumours
+        t_l_intersection{i}=[];
+        t_l_intersection_area{i}=[];
+        t_l_intersection_lymph_count{i} = [];
+        
+        for j=1:size(tumour_polygon_in{i}, 2)
+            if isempty(tumour_polygon_in{i}{j})
+                continue
+            end
+            for k = 1:size(lymphocyte_polygon{i}, 2)
+                if isempty(lymphocyte_polygon{i}{k})
+                    continue
+                end
+                tmp = intersect(tumour_polygon_in{i}{j}, lymphocyte_polygon{i}{k});
+                if tmp.NumRegions == 0
+                    continue
+                end
+                tmp_lymph = inpolygon(data_mini{X_ind}(data_mini{cell_ind}==2), data_mini{Y_ind}(data_mini{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
+                tmp_lymph_count = sum(tmp_lymph);
+                t_l_intersection{i} = [t_l_intersection{i} tmp];
+                t_l_intersection_area{i} = [t_l_intersection_area{i} area(tmp)];
+                t_l_intersection_lymph_count{i} = [t_l_intersection_lymph_count{i} tmp_lymph_count];
+            end
+        end
+    end
+    
+    save([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection.mat'], 't_l_intersection');
+    csvwrite([output_dir '/count/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);
+    csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);%saving in both locations
+    csvwrite([output_dir '/area/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
+    csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
+
+    
+end

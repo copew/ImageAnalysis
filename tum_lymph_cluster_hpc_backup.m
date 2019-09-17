@@ -34,8 +34,8 @@ for image = 1:size(image_list,2)
     info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
     image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
     
-%     data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
-%     image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+    %     data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
+    %     image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
     
     %create indexing
     X_ind = 3;
@@ -410,10 +410,27 @@ for image = 1:size(image_list,2)
     % %the this_tumour/lymphocyte_cluster_boundary is organised in such a way that it has core number
     % %first, then some times it has extra layers before reaches the collection of number for
     % %the clusters. so will unnest within each core
+    %     for i =1:size(core_list, 2) %First un-nest the cells
+    %         this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+    %         this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
+    %     end
+    
     for i =1:size(core_list, 2) %First un-nest the cells
+        if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
+            continue
+        end
         this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+    end
+    
+    for i =1:size(core_list, 2)
+        if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) ==1;
+            continue
+        end
         this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
     end
+    
+    
+    
     
     
     for i =1:size(core_list, 2)
@@ -711,7 +728,7 @@ for image = 1:size(image_list,2)
     csvwrite([ '../count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
     csvwrite(['../area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
-   
+    
     
     
     %%

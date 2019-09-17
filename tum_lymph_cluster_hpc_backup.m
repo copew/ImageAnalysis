@@ -352,35 +352,35 @@ for image = 1:size(image_list,2)
     %save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     %% this bit is to match the dimension of the cluster boundaries with the core_list, as we
-% may need empty cells at the end of the list for cores without either tumour clusters or
-% lymphocyte clusters
-
-% firstly work out the number of cores in total (max of core_total), and how many are in
-% each list. then work out the difference and append.
-tumour_core_total = size(this_tumour_cluster_boundary, 2);
-lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
-core_total = max(core_list);
-
-% if same sizes then dont' worry about it....
-if core_total == tumour_core_total
-    %do nothing
-else
-    tumour_diff = core_total - tumour_core_total;
-    for diff = 1:tumour_diff
-        this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
-    end
-end
-
-if core_total == lymph_core_total
-    %do nothing
+    % may need empty cells at the end of the list for cores without either tumour clusters or
+    % lymphocyte clusters
+    
+    % firstly work out the number of cores in total (max of core_total), and how many are in
+    % each list. then work out the difference and append.
+    tumour_core_total = size(this_tumour_cluster_boundary, 2);
+    lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
+    core_total = max(core_list);
+    
+    % if same sizes then dont' worry about it....
+    if core_total == tumour_core_total
+        %do nothing
     else
-    lymph_diff = core_total - lymph_core_total;
-    for diff = 1:lymph_diff
-        this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+        tumour_diff = core_total - tumour_core_total;
+        for diff = 1:tumour_diff
+            this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
+        end
     end
-end
-
-save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
+    
+    if core_total == lymph_core_total
+        %do nothing
+    else
+        lymph_diff = core_total - lymph_core_total;
+        for diff = 1:lymph_diff
+            this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+        end
+    end
+    
+    save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     %% this is to check if the clusters are correct
     % figure
@@ -756,28 +756,31 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
-    csvwrite([ '../count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
+    csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
-    csvwrite(['../area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
+    csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
     
     
     
     %%
     %calculate area
-    for i = 1:size(core_list, 2)
+    for i = 1:size(tumour_core_list, 2)
         %core area
-        core_area{core_list(i)} = area(core_polygon{i});
+        core_area{tumour_core_list(i)} = area(core_polygon{i});
         %tumour polygon area
-        for j = 1:size(tumour_polygon_in{core_list(i)}, 2)
-            tumour_polygon_area{core_list(i)}{j} = area(tumour_polygon_in{core_list(i)}{j});
+        for j = 1:size(tumour_polygon_in{tumour_core_list(i)}, 2)
+            tumour_polygon_area{tumour_core_list(i)}{j} = area(tumour_polygon_in{tumour_core_list(i)}{j});
         end
         %tumour buffer zone area
-        for k = 1:size(tumour_buffer_in{core_list(i)},2)
-            tumour_buffer_area{core_list(i)}{k} = area(tumour_buffer_in{core_list(i)}{k});
+        for k = 1:size(tumour_buffer_in{tumour_core_list(i)},2)
+            tumour_buffer_area{tumour_core_list(i)}{k} = area(tumour_buffer_in{tumour_core_list(i)}{k});
         end
         %lymphocyte cluster area
-        for l = 1:size(lymphocyte_polygon{core_list(i)}, 2)
-            lymphocyte_polygon_area{core_list(i)}{l} = area(lymphocyte_polygon{core_list(i)}{l});
+    end
+    
+    for i = 1:size(lymphocyte_core_list, 2)
+        for l = 1:size(lymphocyte_polygon{lymphocyte_core_list(i)}, 2)
+            lymphocyte_polygon_area{lymphocyte_core_list(i)}{l} = area(lymphocyte_polygon{lymphocyte_core_list(i)}{l});
         end
     end
     
@@ -855,7 +858,7 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     %% clear workspace before next image when using the for loop
     
-    save(image_list, 'image_list')
+    save('image_list', 'image_list')
     clear all
     load('image_list')
     

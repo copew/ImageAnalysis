@@ -756,7 +756,7 @@ end
     
 for i = 1:size(lymphocyte_core_list, 2)
     for l = 1:size(lymphocyte_polygon{lymphocyte_core_list(i)}, 2)
-        lymphocyte_polygon_area{lymphocyte_core_list(i)}{l} = area(lymphocyte_polygon{(i)}{l});
+        lymphocyte_polygon_area{lymphocyte_core_list(i)}{l} = area(lymphocyte_polygon{lymphocyte_core_list(i)}{l});
     end 
 end
 

@@ -638,7 +638,7 @@ for image = 1:size(image_list,2)
     %% exclude the area that falls outside the cores
     %intersecting regions so only within core area is calculated
     %
-    for i = 1:size(core_list, 2)
+    for i = 1:size(tumour_core_list, 2)
         %     for j = 1:size(tumour_polygon{i}, 2)
         %         if isempty(tumour_polygon{i}{j})
         %             continue
@@ -646,18 +646,18 @@ for image = 1:size(image_list,2)
         %         tumour_polygon_in{i}{j} = intersect(tumour_polygon{i}{j}, core_polygon{tumour_core_list(i)});
         %     end
         % the above is unnecessary as only the buffer goes outside
-        if isempty(tumour_buffer{core_list(i)})
+        if isempty(tumour_buffer{tumour_core_list(i)})
             continue
         end
-        for k = 1:size(tumour_buffer{core_list(i)},2)
-            if isempty(tumour_buffer{core_list(i)}{k})
+        for k = 1:size(tumour_buffer{tumour_core_list(i)},2)
+            if isempty(tumour_buffer{tumour_core_list(i)}{k})
                 continue
             end
-            tumour_buffer_in{core_list(i)}{k} = intersect(tumour_buffer{core_list(i)}{k}, core_polygon{core_list(i)});
+            tumour_buffer_in{tumour_core_list(i)}{k} = intersect(tumour_buffer{tumour_core_list(i)}{k}, core_polygon{tumour_core_list(i)});
         end
     end
     
-    %thi sis just for the rest of the code
+    %this is just for the rest of the code
     tumour_polygon_in = tumour_polygon;
     
     %%
@@ -756,9 +756,9 @@ for image = 1:size(image_list,2)
     
     save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
-    csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
+    %csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
-    csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
+    %csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
     
     
     

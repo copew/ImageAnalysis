@@ -349,7 +349,38 @@ for image = 1:size(image_list,2)
         
     end
     
-    save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
+    %save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
+    
+    %% this bit is to match the dimension of the cluster boundaries with the core_list, as we
+% may need empty cells at the end of the list for cores without either tumour clusters or
+% lymphocyte clusters
+
+% firstly work out the number of cores in total (max of core_total), and how many are in
+% each list. then work out the difference and append.
+tumour_core_total = size(this_tumour_cluster_boundary, 2);
+lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
+core_total = max(core_list);
+
+% if same sizes then dont' worry about it....
+if core_total == tumour_core_total
+    %do nothing
+else
+    tumour_diff = core_total - tumour_core_total;
+    for diff = 1:tumour_diff
+        this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
+    end
+end
+
+if core_total == lymph_core_total
+    %do nothing
+    else
+    lymph_diff = core_total - lymph_core_total;
+    for diff = 1:lymph_diff
+        this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+    end
+end
+
+save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     %% this is to check if the clusters are correct
     % figure
@@ -824,8 +855,8 @@ for image = 1:size(image_list,2)
     
     %% clear workspace before next image when using the for loop
     
-    % save(image_list, 'image_list')
-    % clear all
-    % load('image_list')
+    save(image_list, 'image_list')
+    clear all
+    load('image_list')
     
 end

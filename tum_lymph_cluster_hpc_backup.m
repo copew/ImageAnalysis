@@ -12,7 +12,9 @@
 % image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 %image_list=[603288];
 
-image_list = [603271,603253, 602994,604094, 619877, 626172, 625946]; %this is a list that has had issues on hpc
+image_list = [619877, 626172, 625946]; %this is a list that has had issues on hpc
+
+%done: 603271,603253, 602994,604094,
 
 %% load images and fits files
 
@@ -754,7 +756,7 @@ for image = 1:size(image_list,2)
         end
     end
     
-    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
     %csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
     csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);

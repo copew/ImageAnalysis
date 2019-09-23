@@ -5,15 +5,18 @@ image_list = [603283,603279,603271,603262,603269,603263,603257,603253,602994,603
 %done:
 
 
-src_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/outputfiles_tum_lymph';
-output_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap';
-
-X_ind = 1;
-Y_ind = 2;
-cell_ind = 3;
 
 for image = 1:size(image_list,2)
     image_filenumber = image_list(image);
+    
+    
+    src_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/outputfiles_tum_lymph';
+    output_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap';
+    
+    X_ind = 1;
+    Y_ind = 2;
+    cell_ind = 3;
+    
     
     load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace_clusters.mat']);
     for i = 1:size(in_core, 2)
@@ -23,7 +26,7 @@ for image = 1:size(image_list,2)
     csvwrite([output_dir '/count/' num2str(image_filenumber) '_core_lymph_count.csv'], lymphocyte_core_count);
     csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_core_lymph_count.csv'], lymphocyte_core_count);%saving in both locations
     
-    save(image_list, 'image_list');
+    save('image_list', 'image_list');
     clear all;
     load('image_list');
 end

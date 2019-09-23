@@ -803,10 +803,7 @@ end
         tumour_lymphcluster{lymphocyte_core_list(i)}{l} = inpolygon(in_core{lymphocyte_core_list(i)}{X_ind}(in_core{lymphocyte_core_list(i)}{cell_ind}==1), in_core{lymphocyte_core_list(i)}{Y_ind}(in_core{lymphocyte_core_list(i)}{cell_ind}==1), lymphocyte_polygon{lymphocyte_core_list(i)}{l}.Vertices(:,1), lymphocyte_polygon{lymphocyte_core_list(i)}{l}.Vertices(:,2));
         tumour_lymphcluster_count{lymphocyte_core_list(i)}{l} = sum(lymph_lymphcluster{lymphocyte_core_list(i)}{l});
     end
-    
-    
-    
-    
+  
 end
 
 %create an output file

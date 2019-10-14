@@ -43,7 +43,8 @@ for image = 1:size(image_list,2)
     load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_polygon.mat']);
     load([src_dir '/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_buffer_in.mat']);
     load(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis/mat_file_new/' num2str(image_filenumber) '.mat']);
-    data_mini = num2cell(data_mini, 3);
+    data_mini = num2cell(data_mini, [1 3]);
+    
     if size(lymphocyte_polygon, 2) ~= size(tumour_buffer_in, 2)
         warning(['the lymphocyte and tumour polygons have different number of cores ', num2str(image_filenumber)]);
     end
@@ -87,11 +88,6 @@ for image = 1:size(image_list,2)
                 tmp = intersect(tumour_buffer_in{i}{j}, lymphocyte_polygon{i}{k});
                 if tmp.NumRegions == 0
                     continue
-                end
-                if tmp.NumRegions > 0
-                    plot(tmp)
-                    
-                   
                 end
                 tmp_lymph = inpolygon(data_mini{X_ind}(data_mini{cell_ind}==2), data_mini{Y_ind}(data_mini{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
                 tmp_lymph_count = sum(tmp_lymph);

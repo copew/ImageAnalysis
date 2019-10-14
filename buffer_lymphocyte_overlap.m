@@ -88,6 +88,11 @@ for image = 1:size(image_list,2)
                 if tmp.NumRegions == 0
                     continue
                 end
+                if tmp.NumRegions > 0
+                    plot(tmp)
+                    
+                   
+                end
                 tmp_lymph = inpolygon(data_mini{X_ind}(data_mini{cell_ind}==2), data_mini{Y_ind}(data_mini{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
                 tmp_lymph_count = sum(tmp_lymph);
                 tbuffer_l_intersection{i} = [tbuffer_l_intersection{i} tmp];
@@ -97,11 +102,11 @@ for image = 1:size(image_list,2)
         end
     end
     
-    save([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
-    csvwrite([output_dir '/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
-    csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);%saving in both locations
-    csvwrite([output_dir '/area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
-    csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
+%     save([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection.mat'], 'tbuffer_l_intersection');
+%     csvwrite([output_dir '/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);
+%     csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count.csv'], tbuffer_l_intersection_lymph_count);%saving in both locations
+%     csvwrite([output_dir '/area/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
+%     csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area.csv'], tbuffer_l_intersection_area);
 
     
 end

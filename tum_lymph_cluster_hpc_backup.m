@@ -1,4 +1,4 @@
-% This script requires an image filek (.svs) and its matching cell
+% This script requires an image file (.svs) and its matching cell
 % segmentation file (.fits).
 %
 %this is a total list
@@ -12,7 +12,7 @@
 % image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 %image_list=[603288];
 
-image_list = [619877, 626172, 625946]; %this is a list that has had issues on hpc
+image_list = [619877]; %, 626172, 625946]; %this is a list that has had issues on hpc
 
 %done: 603271,603253, 602994,604094,
 

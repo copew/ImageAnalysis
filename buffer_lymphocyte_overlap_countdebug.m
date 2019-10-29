@@ -26,7 +26,7 @@ output_dir = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documen
 
 X_ind = 1;
 Y_ind = 2;
-cell_ind = 3;
+cell_ind = 3; 
 
 
 %% now make the actual calculation

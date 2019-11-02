@@ -28,7 +28,7 @@ for image = 1:size(image_list,2)
             lymphcluster_centroid{this_core} = [lymphcluster_centroid{this_core}; [x,y]];
             
         end
-        lymphcluster_centroid{this_core} = num2cell(lymphcluster_centroid{this_core});
+       % lymphcluster_centroid{this_core} = num2cell(lymphcluster_centroid{this_core});
     end
     
     

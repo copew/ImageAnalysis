@@ -395,7 +395,7 @@ if core_total == lymph_core_total
 end
 
 
-save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
+save(['./' num2str(image_filenumber) '/workspace_clusters20.mat']);
 
 %% this is to check if the clusters are correct
 % figure
@@ -687,9 +687,9 @@ for i = 1:size(tumour_polygon, 2)
 end
 
 %% now save the files 
-save(['./' num2str(image_filenumber) '/tumour_polygon_in.mat'], 'tumour_polygon_in');
-save(['./' num2str(image_filenumber) '/tumour_buffer_in.mat'], 'tumour_buffer_in');
-save(['./' num2str(image_filenumber) '/lymphocyte_polygon.mat'], 'lymphocyte_polygon');
+%save(['./' num2str(image_filenumber) '/tumour_polygon_in.mat'], 'tumour_polygon_in');
+%save(['./' num2str(image_filenumber) '/tumour_buffer_in.mat'], 'tumour_buffer_in');
+save(['./' num2str(image_filenumber) '/lymphocyte_polygon20.mat'], 'lymphocyte_polygon');
 
 %% looking at spatial relationship between tumour clusters and lymphocyte clusters
 
@@ -724,9 +724,9 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
     end
 end
 
-save(['./' num2str(image_filenumber) '/t_l_intersection.mat'], 't_l_intersection');
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
+save(['./' num2str(image_filenumber) '/t_l_intersection20.mat'], 't_l_intersection');
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20.csv'], t_l_intersection_lymph_count);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area20.csv'], t_l_intersection_area);
 
 
 %%
@@ -762,10 +762,10 @@ lymphocyte_polygon_area_combined=horzcat(lymphocyte_polygon_area{:});
 lymphocyte_polygon_area_combined(cellfun(@isempty, lymphocyte_polygon_area_combined))=[];
 
 %turn into csv files
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_in.csv'], tumour_in_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_buffer.csv'], tumour_buffer_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_core_area.csv'], core_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_area.csv'], lymphocyte_polygon_area_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_in.csv'], tumour_in_area_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_buffer.csv'], tumour_buffer_area_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_core_area.csv'], core_area_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_area20.csv'], lymphocyte_polygon_area_combined);
 
 %% 
 %get the lymphocyte counts as well as tumour cell count
@@ -814,11 +814,11 @@ tumourcell_buffer_count_combined=horzcat(tumourcell_buffer_count{:});
 lymph_lymphcluster_count_combined = horzcat(lymph_lymphcluster_count{:});
 
 %turn into csv files
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_in_count.csv'], lymph_in_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_buffer_count.csv'], lymph_buffer_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_in_count.csv'], tumourcell_in_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_buffer_count.csv'], tumourcell_buffer_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_lymphcluster_count.csv'], lymph_lymphcluster_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_in_count20.csv'], lymph_in_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_buffer_count20.csv'], lymph_buffer_count_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_in_count.csv'], tumourcell_in_count_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_buffer_count.csv'], tumourcell_buffer_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_lymphcluster_count20.csv'], lymph_lymphcluster_count_combined);
 
 %% clear workspace before next image when using the for loop
 

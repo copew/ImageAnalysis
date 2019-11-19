@@ -12,7 +12,7 @@
 % image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 %image_list=[603288];
 
-image_list = [619877]; %, 626172, 625946]; %this is a list that has had issues on hpc
+image_list = [626047]; %[619877]; %, 626172, 625946]; %this is a list that has had issues on hpc
 
 %done: 603271,603253, 602994,604094,
 
@@ -25,7 +25,7 @@ for image = 1:size(image_list,2)
     
     % set parameters
     cluster_size = [5];
-    lymph_cluster_size = [5];
+    lymph_cluster_size = [20];
     lymph_cutoff_size = [50];
     
     % make a folder to save files
@@ -120,13 +120,13 @@ for image = 1:size(image_list,2)
         this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
     end
     
-    %     figure % Plot the results for sanity
-    %     imshow(large_thumbnail_io)
-    %     hold on;
-    %
-    %     %for i = 1:size(grain,2)
-    %         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
-    %     %end
+%         figure % Plot the results for sanity
+%         imshow(large_thumbnail_io)
+%         hold on;
+%     
+%         %for i = 1:size(grain,2)
+%             plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
+%         %end
     
     % Now convert each into a polygon
     core_polygon= cell(0);
@@ -359,29 +359,29 @@ for image = 1:size(image_list,2)
     
     % firstly work out the number of cores in total (max of core_total), and how many are in
     % each list. then work out the difference and append.
-    tumour_core_total = size(this_tumour_cluster_boundary, 2);
-    lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
-    core_total = max(core_list);
-    
-    % if same sizes then dont' worry about it....
-    if core_total == tumour_core_total
-        %do nothing
-    else
-        tumour_diff = core_total - tumour_core_total;
-        for diff = 1:tumour_diff
-            this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
-        end
-    end
-    
-    if core_total == lymph_core_total
-        %do nothing
-    else
-        lymph_diff = core_total - lymph_core_total;
-        for diff = 1:lymph_diff
-            this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
-        end
-    end
-    
+%     tumour_core_total = size(this_tumour_cluster_boundary, 2);
+%     lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
+%     core_total = max(core_list);
+%     
+%     % if same sizes then dont' worry about it....
+%     if core_total == tumour_core_total
+%         %do nothing
+%     else
+%         tumour_diff = core_total - tumour_core_total;
+%         for diff = 1:tumour_diff
+%             this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
+%         end
+%     end
+%     
+%     if core_total == lymph_core_total
+%         %do nothing
+%     else
+%         lymph_diff = core_total - lymph_core_total;
+%         for diff = 1:lymph_diff
+%             this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+%         end
+%     end
+%     
 %    save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
     
     %% this is to check if the clusters are correct

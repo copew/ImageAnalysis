@@ -1,7 +1,7 @@
 %% looking at spatial relationship between tumour clusters and lymphocyte clusters
 % all the indexing should be based on the tumour clusters
 
-image_list=[603292, 603298];
+image_list=[626047];
 %won't run
 % 
 

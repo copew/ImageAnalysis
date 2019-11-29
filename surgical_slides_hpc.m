@@ -3,7 +3,11 @@
 % an cellularity calculation is attempted
 % also interaction between tumour cells, lymphocytes and normal cells
 
-image_list = [];
+image_list = [600227]; 
+% done: 602185,599871, 600227, 600245, 600268,600281 
+% roo big: 605745, 
+image_path_stem = '/Volumes/Wei/Neoadjuvant/trimmed_matlab_data/';
+
 
 % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
 %
@@ -28,14 +32,14 @@ for image = 1:size(image_list,2)
     
     % set parameters
     cluster_size = [5];
-    lymph_cluster_size = [5];
+    lymph_cluster_size = [20];
     lymph_cutoff_size = [50];
     
     % make a folder to save files
     mkdir(num2str(image_filenumber));
     
     data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-    image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+    image_path = ['/Volumes/Wei/Neoadjuvant/NeoAdjuvant_Images/TransNeoSlides/' num2str(image_filenumber) '.svs'];
     
     %create indexing
     X_ind = 1;
@@ -46,6 +50,27 @@ for image = 1:size(image_list,2)
     data_trimmed = data.data_mini;
     data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
     
+    
+    
+    %% this bit is for debug for plotting
+    % First get the thumbnail
+    image_info=imfinfo(image_path);
+    thumbnail_height_scale_factor = image_info(1).Height/image_info(2).Height;
+    thumbnail_width_scale_factor = image_info(1).Width/image_info(2).Width;
+    thumbnail_overall_scale_factor = mean([thumbnail_height_scale_factor,thumbnail_width_scale_factor]);
+    low_res_layer = length(image_info)-2;
+    high_res_layer = 1;
+    thumbnail_layer = 2;
+    %By convention:
+    % First level	Full resolution image
+    % Second level	Thumbnail
+    % Third level to N-2 Level	A reduction by a power of 2 (4:1 ratio, 16:1 ratio, 32:1 ratio, etc)
+    % N-1 Level	Slide Label
+    % N Level	Entire Slide with cropped region delineated in green
+    %image_io=imread(image_path,'Index',low_res_layer);
+    
+    thumbnail_io=imread(image_path,'Index',thumbnail_layer);
+    large_thumbnail_io = imresize(thumbnail_io,thumbnail_overall_scale_factor);
     
     %% identify tumour clusters
     
@@ -83,7 +108,7 @@ for image = 1:size(image_list,2)
         for this_cell=1:n
             if ~visited(this_cell)
                 visited(this_cell)=true;
-                Neighbours=setdiff(all_indexes(all_multi_real_distances{this_core}(:,this_cell)<=epsilon,this_cell),this_cell)';
+                Neighbours=setdiff(all_indexes(all_multi_real_distances(:,this_cell)<=epsilon/2,this_cell),this_cell)';
                 if numel(Neighbours)<this_clustsize
                     % X(i,:) is NOISE
                     isnoise(this_cell)=true;
@@ -96,7 +121,7 @@ for image = 1:size(image_list,2)
                         
                         if ~visited(this_neighbour_cell)
                             visited(this_neighbour_cell)=true;
-                            Neighbours2=setdiff(all_indexes(all_multi_real_distances(:,this_neighbour_cell)<=epsilon,this_neighbour_cell),this_neighbour_cell)';
+                            Neighbours2=setdiff(all_indexes(all_multi_real_distances(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
                             if numel(Neighbours2)>=this_clustsize
                                 Neighbours=[Neighbours Neighbours2];   %#ok
                             end
@@ -125,8 +150,9 @@ for image = 1:size(image_list,2)
         end
     end
     % the output that feed into the next step is this_tumour_cluster_boundary
-    
- 
+  
+    %% lymphocyte clustering
+  
     % lymphocyte clusters
     
     base_cells = data_trimmed{cell_ind}==2;
@@ -137,12 +163,12 @@ for image = 1:size(image_list,2)
 %         continue
 %     end
 %     
-    [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', lymph_cluster_size+1);
+    [all_multi_real_distances, all_indexes] = pdist2([data_trimmed{X_ind}(neighbour_cells) data_trimmed{Y_ind}(neighbour_cells)],[data_trimmed{X_ind}(base_cells) data_trimmed{Y_ind}(base_cells)],'euclidean','Smallest', lymph_cluster_size+1);
     
     i = 0;
-    if size(all_multi_real_distances{this_core},1)<max(lymph_cluster_size)+1
-        all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(lymph_cluster_size)+1,:)=NaN;
-        this_lymphocyte_cluster_boundary{this_core} = [];
+    if size(all_multi_real_distances,1)<max(lymph_cluster_size)+1
+        all_multi_real_distances(size(all_multi_real_distances,1)+1:max(lymph_cluster_size)+1,:)=NaN;
+        this_lymphocyte_cluster_boundary = [];
         continue;
     end
     
@@ -162,13 +188,13 @@ for image = 1:size(image_list,2)
         %Remember that first index is self, so no need
         %to subtract one.
         %[hist_y, hist_x] = hist(all_multi_real_distances{this_core}(this_clustsize,:),1000);
-        [hist_y, hist_x] = hist(all_multi_real_distances{this_core}(3,:),1000);
+        [hist_y, hist_x] = hist(all_multi_real_distances(3,:),1000);
         [epsilon, ~] = knee_pt(hist_y,hist_x,true);
         
         for this_cell=1:n
             if ~visited(this_cell)
                 visited(this_cell)=true;
-                Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon/2,this_cell),this_cell)';
+                Neighbours=setdiff(all_indexes(all_multi_real_distances(:,this_cell)<=epsilon/2,this_cell),this_cell)';
                 if numel(Neighbours)<this_clustsize
                     % X(i,:) is NOISE
                     isnoise(this_cell)=true;
@@ -181,7 +207,7 @@ for image = 1:size(image_list,2)
                         
                         if ~visited(this_neighbour_cell)
                             visited(this_neighbour_cell)=true;
-                            Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
+                            Neighbours2=setdiff(all_indexes(all_multi_real_distances(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
                             if numel(Neighbours2)>=this_clustsize
                                 Neighbours=[Neighbours Neighbours2];   %#ok
                             end
@@ -199,105 +225,102 @@ for image = 1:size(image_list,2)
             end
         end
         
-        x_data_here = in_core{this_core}{X_ind}(neighbour_cells);
-        y_data_here = in_core{this_core}{Y_ind}(neighbour_cells);
+        x_data_here = data_trimmed{X_ind}(neighbour_cells);
+        y_data_here = data_trimmed{Y_ind}(neighbour_cells);
         
         for this_cluster_number = 1:max(cluster_membership{i})
             this_x_subset = x_data_here(cluster_membership{i}==this_cluster_number);
             this_y_subset = y_data_here(cluster_membership{i}==this_cluster_number);
             this_lymphocyte_cluster_boundary_numbers = boundary(this_x_subset,this_y_subset);
-            this_lymphocyte_cluster_boundary{this_core}{i}{this_cluster_number} = [this_x_subset(this_lymphocyte_cluster_boundary_numbers),this_y_subset(this_lymphocyte_cluster_boundary_numbers)];
+            this_lymphocyte_cluster_boundary{i}{this_cluster_number} = [this_x_subset(this_lymphocyte_cluster_boundary_numbers),this_y_subset(this_lymphocyte_cluster_boundary_numbers)];
         end
     end
 
     
-end
 
 
-%% this bit is to match the dimension of the cluster boundaries with the core_list, as we
-% may need empty cells at the end of the list for cores without either tumour clusters or
-% lymphocyte clusters
 
-% firstly work out the number of cores in total (max of core_total), and how many are in
-% each list. then work out the difference and append.
-tumour_core_total = size(this_tumour_cluster_boundary, 2);
-lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
-core_total = max(core_list);
-
-% if same sizes then dont' worry about it....
-if core_total == tumour_core_total
-    %do nothing
-else
-    tumour_diff = core_total - tumour_core_total;
-    for diff = 1:tumour_diff
-        this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
-    end
-end
-
-if core_total == lymph_core_total
-    %do nothing
-else
-    lymph_diff = core_total - lymph_core_total;
-    for diff = 1:lymph_diff
-        this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
-    end
-end
-
-
-save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
-
-%% this is to check if the clusters are correct
-% figure
-% ax=gca();
-% hold on;
-% imshow(large_thumbnail_io);
-% hold(ax, 'on');
-% % draw the tumour cluster first
-%     for i = 1:size(this_tumour_cluster_boundary, 2)
-%
-%         if isempty(this_tumour_cluster_boundary{i}) == 1
-%             continue
-%         end
-%         if isempty(this_tumour_cluster_boundary{i}{1}) == 1
-%             continue
-%         end
-%
-%         % this_tumour_cluster_boundary{i}{1} =
-%         % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
-%         % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
-%         % unnecessarily
-%         for j = 1:size(this_tumour_cluster_boundary{i}{1}, 2)
-%             hold on;
-%             if isempty(this_tumour_cluster_boundary{i}{1}{j}) == 1
-%                 continue
-%             end
-%             plot(this_tumour_cluster_boundary{i}{1}{j}(:,1), this_tumour_cluster_boundary{i}{1}{j}(:,2), 'k-');
-%         end
-%         hold on;
+% %% this bit is to match the dimension of the cluster boundaries with the core_list, as we
+% % may need empty cells at the end of the list for cores without either tumour clusters or
+% % lymphocyte clusters
+% 
+% % firstly work out the number of cores in total (max of core_total), and how many are in
+% % each list. then work out the difference and append.
+% tumour_core_total = size(this_tumour_cluster_boundary, 2);
+% lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
+% core_total = max(core_list);
+% 
+% % if same sizes then dont' worry about it....
+% if core_total == tumour_core_total
+%     %do nothing
+% else
+%     tumour_diff = core_total - tumour_core_total;
+%     for diff = 1:tumour_diff
+%         this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
 %     end
-%
-% % now draw the lymphocyte cluster
-% for i = 1:size(this_lymphocyte_cluster_boundary, 2)
-%     if isempty(this_lymphocyte_cluster_boundary{i}) == 1
-%         continue
-%     end
-%     if isempty(this_lymphocyte_cluster_boundary{i}{1}) == 1
-%         continue
-%     end
-%     %this_lymphocyte_cluster_boundary{i}{1} =
-%     %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
-%     %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
-%     %unnecesarily
-%     for j = 1:size(this_lymphocyte_cluster_boundary{i}{1}, 2)
-%         hold on;
-%         if isempty(this_lymphocyte_cluster_boundary{i}{1}{j}) == 1
-%             continue
-%         end
-%         plot(this_lymphocyte_cluster_boundary{i}{1}{j}(:,1), this_lymphocyte_cluster_boundary{i}{1}{j}(:,2), 'r-');
-%     end
-%     hold on;
 % end
-% hold(ax, 'off')
+% 
+% if core_total == lymph_core_total
+%     %do nothing
+% else
+%     lymph_diff = core_total - lymph_core_total;
+%     for diff = 1:lymph_diff
+%         this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+%     end
+% end
+% 
+% 
+% save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
+% 
+%% this is to check if the clusters are correct
+figure
+ax=gca();
+hold on;
+imshow(large_thumbnail_io);
+hold(ax, 'on');
+% draw the tumour cluster first
+    for i = 1:size(this_tumour_cluster_boundary, 2)
+
+        if isempty(this_tumour_cluster_boundary{i}) == 1
+            continue
+        end
+
+        % this_tumour_cluster_boundary{i}{1} =
+        % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
+        % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
+        % unnecessarily
+        for j = 1:size(this_tumour_cluster_boundary{i}, 2)
+            hold on;
+            if isempty(this_tumour_cluster_boundary{i}{j}) == 1
+                continue
+            end
+            plot(this_tumour_cluster_boundary{i}{j}(:,1), this_tumour_cluster_boundary{i}{j}(:,2), 'k-');
+        end
+        hold on;
+    end
+
+% now draw the lymphocyte cluster
+for i = 1:size(this_lymphocyte_cluster_boundary, 2)
+    if isempty(this_lymphocyte_cluster_boundary{i}) == 1
+        continue
+    end
+
+    %this_lymphocyte_cluster_boundary{i}{1} =
+    %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
+    %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
+    %unnecesarily
+    for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
+        hold on;
+        if isempty(this_lymphocyte_cluster_boundary{i}{j}) == 1
+            continue
+        end
+        plot(this_lymphocyte_cluster_boundary{i}{j}(:,1), this_lymphocyte_cluster_boundary{i}{j}(:,2), 'r-');
+    end
+    hold on;
+end
+hold(ax, 'off')
+
+end
 
 
 %% now convert each into a polygon - old code
@@ -674,7 +697,4 @@ csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_l
 % save(image_list, 'image_list')
 % clear all
 % load('image_list')
-
-
-end
 

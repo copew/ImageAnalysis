@@ -618,7 +618,7 @@ for i = 1:size(tumour_polygon, 2)
         if isempty(tumour_polygon{i}{j})
             continue
         end
-        tumour_buffer{i}{j} = polybuffer(tumour_polygon{i}{j},100);
+        tumour_buffer{i}{j} = polybuffer(tumour_polygon{i}{j},200);
         %tumour_buffer{core_list(i)}{j} = polyshape(tumour_buffer{core_list(i)}{j});
         %this is not necessary as it is already a polyshape
     end

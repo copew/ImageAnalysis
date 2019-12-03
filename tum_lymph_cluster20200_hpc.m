@@ -738,7 +738,7 @@ tbuffer_l_centroid_count = [];
     end
 end
 
- save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 't_l_intersection20200.mat'], 't_l_intersection');
+save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection20200.mat'], 't_l_intersection');
 csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20200.csv'], t_l_intersection_lymph_count);
 csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area20200.csv'], t_l_intersection_area);
 

@@ -530,36 +530,38 @@ tbuffer_l_intersection_area=[];
 tbuffer_l_intersection_lymph_count= [];
 tbuffer_l_centroid_count = [];
 
-i=1:size(overlap_list, 2) %looking at the cores with tumours
-t_l_intersection{overlap_list(i)}=[];
-t_l_intersection_area{overlap_list(i)}=[];
-t_l_intersection_lymph_count{overlap_list(i)} = [];
-t_l_centroid_count{overlap_list(i)} = [];
-
-for j=1:size(tumour_polygon_in{overlap_list(i)}, 2)
-    if isempty(tumour_polygon_in{overlap_list(i)}{j})
-        continue
-    end
-    for k = 1:size(lymphocyte_polygon{overlap_list(i)}, 2)
-        if isempty(lymphocyte_polygon{overlap_list(i)}{k})
+for i=1:size(overlap_list, 2) %looking at the cores with tumours
+    t_l_intersection{overlap_list(i)}=[];
+    t_l_intersection_area{overlap_list(i)}=[];
+    t_l_intersection_lymph_count{overlap_list(i)} = [];
+    t_l_centroid_count{overlap_list(i)} = [];
+    
+    for j=1:size(tumour_polygon_in{overlap_list(i)}, 2)
+        if isempty(tumour_polygon_in{overlap_list(i)}{j})
             continue
         end
-        tmp = intersect(tumour_polygon_in{overlap_list(i)}{j}, lymphocyte_polygon{overlap_list(i)}{k});
-        if tmp.NumRegions == 0
-            continue
+        for k = 1:size(lymphocyte_polygon{overlap_list(i)}, 2)
+            if isempty(lymphocyte_polygon{overlap_list(i)}{k})
+                continue
+            end
+            tmp = intersect(tumour_polygon_in{overlap_list(i)}{j}, lymphocyte_polygon{overlap_list(i)}{k});
+            if tmp.NumRegions == 0
+                continue
+            end
+            tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
+            tmp_lymph_count = sum(tmp_lymph);
+            [x,y] = centroid(lymphocyte_polygon{i}{k});
+            tmp_l_centroid = [tmp_l_centroid; [x,y]];
+            tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));
+            tmp_l_centroid_count = sum(tmp_centroid_in);
+            t_l_centroid_count{i}{j} = t_l_centroid_count{i}{j} + tmp_l_centroid_count;
+            t_l_intersection{overlap_list(i)} = [t_l_intersection{overlap_list(i)} tmp];
+            t_l_intersection_area{overlap_list(i)} = [t_l_intersection_area{overlap_list(i)} area(tmp)];
+            t_l_intersection_lymph_count{overlap_list(i)} = [t_l_intersection_lymph_count{overlap_list(i)} tmp_lymph_count];
         end
-        tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
-        tmp_lymph_count = sum(tmp_lymph);
-        [x,y] = centroid(lymphocyte_polygon{i}{k});
-        tmp_l_centroid = [tmp_l_centroid; [x,y]];
-        tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));
-        tmp_l_centroid_count = sum(tmp_centroid_in);
-        t_l_centroid_count{i}{j} = t_l_centroid_count{i}{j} + tmp_l_centroid_count;
-        t_l_intersection{overlap_list(i)} = [t_l_intersection{overlap_list(i)} tmp];
-        t_l_intersection_area{overlap_list(i)} = [t_l_intersection_area{overlap_list(i)} area(tmp)];
-        t_l_intersection_lymph_count{overlap_list(i)} = [t_l_intersection_lymph_count{overlap_list(i)} tmp_lymph_count];
     end
 end
+
 
 save(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection20200.mat'], 't_l_intersection');
 csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20200.csv'], t_l_intersection_lymph_count);

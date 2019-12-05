@@ -332,6 +332,33 @@ end
 
 % firstly work out the number of cores in total (max of core_total), and how many are in
 % each list. then work out the difference and append.
+
+if exist('this_lymphocyte_cluster_boundary', 'var') == 0
+    save(['./' num2str(image_filenumber) '/workspace_clusters20.mat']);
+    lymphocyte_polygon = [];
+    t_l_intersection = [];
+    tbuffer_l_intersection = [];
+    
+    t_l_intersection_lymph_count=0;
+    t_l_intersection_area =0;
+    tbuffer_l_intersection_lymph_count=0;
+    tbuffer_l_intersection_area=0;
+    lymphocyte_polygon_area_combined=0;
+    lymph_lymphcluster_count_combined=0;
+    
+    save(['./output20200/' num2str(image_filenumber) '/t_l_intersection20.mat'], 't_l_intersection');
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20.csv'], t_l_intersection_lymph_count);
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area20.csv'], t_l_intersection_area);
+    save(['./output20200/' num2str(image_filenumber) '/lymphocyte_polygon20.mat'], 'lymphocyte_polygon');
+    save(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection20200.mat'], 'tbuffer_l_intersection');
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count20200.csv'], tbuffer_l_intersection_lymph_count);
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area20200.csv'], tbuffer_l_intersection_area);
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_area20.csv'], lymphocyte_polygon_area_combined);
+    csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_lymphcluster_count20.csv'], lymph_lymphcluster_count_combined);
+    return
+end
+    
+
 tumour_core_total = size(this_tumour_cluster_boundary, 2);
 lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
 core_total = max(core_list);
@@ -551,6 +578,7 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
             tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
             tmp_lymph_count = sum(tmp_lymph);
             tmp_l_centroid = [];
+            t_l_centroid_count{i}{j}=0;
             [x,y] = centroid(lymphocyte_polygon{i}{k});
             tmp_l_centroid = [tmp_l_centroid; [x,y]];
             tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));

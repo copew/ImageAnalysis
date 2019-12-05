@@ -6,55 +6,43 @@
 %,603288, 603298,603292
 
 
+% ***** this works but all the saves etc are not checked and debugged. i am now working on
+% the hpc version so this needs tidying
+
 
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
-% image_list=[603288, 593987, 619857, 619872, 619905, 625951];
-%image_list=[603288];
+image_list=[603006];
+%image_list=[603288, , 619857, 619872, 619905, 625951, 593987];
 
 %% load images and fits files
 
-function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-disp(image_filenumber_fullpath)
-disp(class(image_filenumber_fullpath))
-if ischar(image_filenumber_fullpath)
-[image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-image_filenumber = str2num(image_filenumber);
-if isempty(image_path_stem)
-image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
-elseif isnumeric(image_filenumber_fullpath)
-image_filenumber = image_filenumber_fullpath;
-image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
-
-% for image = 1:size(image_list,2)
-% image_filenumber = image_list(image);
-
-% set parameters
-cluster_size = [5];
-lymph_cluster_size = [20];
-lymph_cutoff_size = [50];
-
-% make a folder to save files
-
-
-% loading files
-%data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-%info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-
-data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
-
-%create indexing
-X_ind = 1;
-Y_ind = 2;
-% overlap = 22;
-% s2n=61;
-cell_ind = 3;
+for image = 1:size(image_list,2)
+    
+    image_filenumber = image_list(image);
+    
+    % set parameters
+    cluster_size = [5];
+    lymph_cluster_size = [20];
+    lymph_cutoff_size = [50];
+    
+    % make a folder to save files
+    mkdir(num2str(image_filenumber));
+    
+    % loading files
+    data = load(['./mat_file_new/' num2str(image_filenumber) '.mat']);
+    %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+    image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    
+    %     data= load(['/rds-d4/user/ww234/hpc-work/itpt' num2str(image_filenumber) '.mat']);
+    %     image_path = ["/rds-d4/user/ww234/hpc-work/itpt" num2str(image_filenumber) '.svs'];
+    
+    %create indexing
+    X_ind = 1;
+    Y_ind = 2;
+    % overlap = 22;
+    % s2n=61;
+    cell_ind = 3;
 
 %% tidying up data
 
@@ -159,6 +147,18 @@ for i = 1:size(core_polygon, 2)
         in_core{i}{j} = data_trimmed{j}(in_polygon{i}, :);
     end
 end
+
+% 740 sec for this sample 603006
+
+%trying something else
+% tic
+% for i = 1:size(core_polygon, 2)
+%     in_polygon{i} = inpolygon(data_trimmed{X_ind}, data_trimmed{Y_ind}, core_polygon{i}.Vertices(:,1), core_polygon{i}.Vertices(:,2));
+%     in_core{i} = cell2mat(data_trimmed) .* in_polygon{i};
+% end
+% toc
+% 783 sec for this sample 603006 soooooo no. also it's kept all the zeroes
+
 
 % figure % Plot the results for sanity
 % imshow(large_thumbnail_io)
@@ -395,8 +395,6 @@ if core_total == lymph_core_total
 end
 
 
-save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
-
 %% this is to check if the clusters are correct
 % figure
 % ax=gca();
@@ -417,12 +415,12 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
 %         % this_tumour_cluster_boundary{i}{1}(~cellfun('isempty',
 %         % this_tumour_cluster_boundary{i}{1})); % this may be introducing extra layers
 %         % unnecessarily
-%         for j = 1:size(this_tumour_cluster_boundary{i}{1}, 2)
+%         for j = 1:size(this_tumour_cluster_boundary{i}, 2)
 %             hold on;
-%             if isempty(this_tumour_cluster_boundary{i}{1}{j}) == 1
+%             if isempty(this_tumour_cluster_boundary{i}{j}) == 1
 %                 continue
 %             end
-%             plot(this_tumour_cluster_boundary{i}{1}{j}(:,1), this_tumour_cluster_boundary{i}{1}{j}(:,2), 'k-');
+%             plot(this_tumour_cluster_boundary{i}{j}(:,1), this_tumour_cluster_boundary{i}{j}(:,2), 'k-');
 %         end
 %         hold on;
 %     end
@@ -432,19 +430,19 @@ save(['./' num2str(image_filenumber) '/workspace_clusters.mat']);
 %     if isempty(this_lymphocyte_cluster_boundary{i}) == 1
 %         continue
 %     end
-%     if isempty(this_lymphocyte_cluster_boundary{i}{1}) == 1
+%     if isempty(this_lymphocyte_cluster_boundary{i}) == 1
 %         continue
 %     end
 %     %this_lymphocyte_cluster_boundary{i}{1} =
 %     %this_lymphocyte_cluster_boundary{i}{1}(~cellfun('isempty',
 %     %this_lymphocyte_cluster_boundary{i}{1})); % this may be introducing extralayers
 %     %unnecesarily
-%     for j = 1:size(this_lymphocyte_cluster_boundary{i}{1}, 2)
+%     for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
 %         hold on;
-%         if isempty(this_lymphocyte_cluster_boundary{i}{1}{j}) == 1
+%         if isempty(this_lymphocyte_cluster_boundary{i}{j}) == 1
 %             continue
 %         end
-%         plot(this_lymphocyte_cluster_boundary{i}{1}{j}(:,1), this_lymphocyte_cluster_boundary{i}{1}{j}(:,2), 'r-');
+%         plot(this_lymphocyte_cluster_boundary{i}{j}(:,1), this_lymphocyte_cluster_boundary{i}{j}(:,2), 'r-');
 %     end
 %     hold on;
 % end
@@ -551,6 +549,9 @@ lymphocyte_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty
 
 %the end result is tumour_polygon, and lymphocyte_polygon
 
+
+save(['./' num2str(image_filenumber) '/workspace_clusters20200.mat']);
+
 %% sort out overlaps
 
 
@@ -578,34 +579,7 @@ for i =1:size(tumour_polygon, 2)
     
 end
 
-%now remove empty polygons
 
-% none of these work.... but will just add continue if empty for later on
-
-%     find(~cellfun('isempty', x))
-%
-%     for i =1:size(core_list, 2)
-%         for j = 1:size(tumour_polygon{core_list(i)}, 2)
-%             these_empty{i}{j} = find(~cellfun('isempty', tumour_polygon{core_list(i)}{j}(:)));
-%         end
-%     end
-%
-%     tumour_polygon_non_empty= tumour_polygon;
-%     tumour_polygon_non_empty{core_list(i)}(these_empty) = [];
-
-
-%this is an atteempt with while loop, but not very sensible.
-%     tumour_polygon_non_empty= tumour_polygon;
-%     for i =1:size(core_list, 2)
-%         j=0;
-%         while j <size(tumour_polygon{core_list(i)}, 2)
-%             j=j+1;
-%             if isempty(tumour_polygon{core_list(i)}{j})
-%                 tumour_polygon_non_empty{core_list(i)}(j) = [];
-%                 j=0;
-%             end
-%         end
-%     end
 
 
 
@@ -687,46 +661,202 @@ for i = 1:size(tumour_polygon, 2)
 end
 
 %% now save the files 
-save(['./' num2str(image_filenumber) '/tumour_polygon_in.mat'], 'tumour_polygon_in');
-save(['./' num2str(image_filenumber) '/tumour_buffer_in.mat'], 'tumour_buffer_in');
-save(['./' num2str(image_filenumber) '/lymphocyte_polygon.mat'], 'lymphocyte_polygon');
+save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'tumour_polygon_in200.mat'], 'tumour_polygon_in');
+save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'tumour_buffer_in200.mat'], 'tumour_buffer_in');
+save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) 'lymphocyte_polygon20.mat'], 'lymphocyte_polygon');
 
 %% looking at spatial relationship between tumour clusters and lymphocyte clusters
 
 % first of all look at overlaps
 % need to select the cores with both tumour polygons and lymphocyte polygons
-overlap_list = intersect(tumour_core_list, lymphocyte_core_list);
-t_l_intersection = [];
 
-for i=1:size(overlap_list, 2) %looking at the cores with tumours
-    t_l_intersection{overlap_list(i)}=[];
-    t_l_intersection_area{overlap_list(i)}=[];
-    t_l_intersection_lymph_count{overlap_list(i)} = [];
-    
-    for j=1:size(tumour_polygon_in{overlap_list(i)}, 2)
-        if isempty(tumour_polygon_in{overlap_list(i)}{j})
+t_l_intersection = [];
+t_l_intersection_area=[];
+t_l_intersection_lymph_count = [];
+t_l_centroid_count = [];
+tbuffer_l_intersection = [];
+tbuffer_l_intersection_area=[];
+tbuffer_l_intersection_lymph_count= [];
+tbuffer_l_centroid_count = [];
+
+
+  for i=1:size(tumour_polygon_in, 2)
+        if isempty(tumour_polygon_in{i})
+            t_l_intersection{i}=[];
+            t_l_intersection_area{i}=[];
+            t_l_intersection_lymph_count{i} = [];
             continue
         end
-        for k = 1:size(lymphocyte_polygon{overlap_list(i)}, 2)
-            if isempty(lymphocyte_polygon{overlap_list(i)}{k})
+        for j=1:size(tumour_polygon_in{i}, 2)
+            
+            if isempty(tumour_polygon_in{i}{j})
+                t_l_intersection{i}{j} = [];
+                t_l_intersection_area{i}{j} = [];
+                t_l_intersection_lymph_count{i}{j} = [];
                 continue
             end
-            tmp = intersect(tumour_polygon_in{overlap_list(i)}{j}, lymphocyte_polygon{overlap_list(i)}{k});
-            if tmp.NumRegions == 0
+
+            
+            t_l_intersection{i}{j}=[];
+            t_l_intersection_area{i}{j}=[0];
+            t_l_intersection_lymph_count{i}{j} = [0];
+            t_l_centroid{i}{j}=[];
+            t_l_centroid_count{i}{j}=[0];
+            
+            
+            
+%             clear the centroid tmp measurements
+            tmp_l_centroid_count = [];
+            tmp_l_centroid = [];
+            
+            
+            tumour_core_total = size(tumour_buffer_in, 2);
+            lymph_core_total = size(lymphocyte_polygon, 2);
+            
+            %if same sizes then %dont' worry about it....
+            if lymph_core_total == tumour_core_total
+                %do nothing
+            else
+                diff = lymph_core_total - tumour_core_total;
+                if diff > 0
+                    for d = 1:diff
+                        tumour_buffer_in{1, tumour_core_total+d} = [];
+                        
+                        
+                    end
+                else
+                    for d = 1:abs(diff)
+                        lymphocyte_polygon{1, lymph_core_total+d} = [];
+                    end
+                end
+            end
+            
+            
+            
+            for k = 1:size(lymphocyte_polygon{i}, 2)
+                if isempty(lymphocyte_polygon{i}{k})
+                    continue
+                end
+                tmp = intersect(tumour_polygon_in{i}{j}, lymphocyte_polygon{i}{k});
+                
+                if tmp.NumRegions == 0
+                    continue
+                end
+                tmp_lymph = inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==2), data_trimmed{Y_ind}(data_trimmed{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
+                tmp_lymph_count = sum(tmp_lymph);
+                t_l_intersection{i}{j} = [t_l_intersection{i}{j} tmp];
+                t_l_intersection_area{i}{j} = t_l_intersection_area{i}{j}+area(tmp);
+                t_l_intersection_lymph_count{i}{j} = t_l_intersection_lymph_count{i}{j} + tmp_lymph_count;
+                
+%                 whilst still looping through tumour polygons, calculate where the lymphoid
+%                 centroid are and see whether it fit
+                [x,y] = centroid(lymphocyte_polygon{i}{k});
+                tmp_l_centroid = [tmp_l_centroid; [x,y]];
+                tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));
+                tmp_l_centroid_count = sum(tmp_centroid_in);
+                t_l_centroid_count{i}{j} = t_l_centroid_count{i}{j} + tmp_l_centroid_count;
+            end
+            
+            
+        end %end of lymphocyte polygon{i}
+  end %end of tumour polygon{i}
+  
+  save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection20200.mat'], 't_l_intersection');
+  
+  t_l_intersection_lymph_count_cell = extractmycells(t_l_intersection_lymph_count);
+  t_l_intersection_area_cell = extractmycells(t_l_intersection_area);
+  t_l_centroid_count_cell = extractmycells(t_l_centroid_count);
+  
+      %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20200.csv'], t_l_intersection_lymph_count_cell);
+      csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymph_intersection_count20200.csv'], t_l_intersection_lymph_count_cell);
+      %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area20200.csv'], t_l_intersection_area_cell);
+      csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/area/' num2str(image_filenumber) '_intersection_area20200.csv'], t_l_intersection_area_cell);
+  %
+  %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroidin_count20200.csv'], t_l_centroid_count_cell);
+  csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_centroidin_count20200.csv'], t_l_centroid_count_cell);
+   
+
+  
+  
+  
+  
+  %this is added to work out the overlap or intersection, between lymphocyte and buffer zones
+    
+    
+    for i=1:size(tumour_buffer_in, 2)
+        if isempty(tumour_buffer_in{i})
+            tbuffer_l_intersection{i}=[];
+            tbuffer_l_intersection_area{i}=[];
+            tbuffer_l_intersection_lymph_count{i} = [];
+            continue
+        end
+        
+        for j=1:size(tumour_buffer_in{i}, 2)
+            if isempty(tumour_buffer_in{i}{j})
+                tbuffer_l_intersection{i}{j} = [];
+                tbuffer_l_intersection_area{i}{j} = [];
+                tbuffer_l_intersection_lymph_count{i}{j} = [];
                 continue
             end
-            tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
-            tmp_lymph_count = sum(tmp_lymph);
-            t_l_intersection{overlap_list(i)} = [t_l_intersection{overlap_list(i)} tmp];
-            t_l_intersection_area{overlap_list(i)} = [t_l_intersection_area{overlap_list(i)} area(tmp)];
-            t_l_intersection_lymph_count{overlap_list(i)} = [t_l_intersection_lymph_count{overlap_list(i)} tmp_lymph_count];
+            
+            tbuffer_l_intersection{i}{j}=[];
+            tbuffer_l_intersection_area{i}{j}=[0];
+            tbuffer_l_intersection_lymph_count{i}{j} = [0];
+            tbuffer_l_centroid{i}{j}=[];
+            tbuffer_l_centroid_count{i}{j}=[0];
+            
+            %clear the centroid tmp measurements
+            tmp_l_centroid_count = [];
+            tmp_l_centroid = [];
+            
+            for k = 1:size(lymphocyte_polygon{i}, 2)
+                %                 if isempty(lymphocyte_polygon{i})
+                %                     tbuffer_l_intersection{i} = [];
+                %                     tbuffer_l_intersection_area{i} = [0];
+                %                     tbuffer_l_intersection_lymph_count{i} = [0];
+                %                     continue
+                %                 end
+                if isempty(lymphocyte_polygon{i}{k})
+                    continue
+                end
+                
+                tmp = intersect(tumour_buffer_in{i}{j}, lymphocyte_polygon{i}{k});
+                
+                if tmp.NumRegions == 0
+                    continue
+                end
+                tmp_lymph = inpolygon(data_trimmed{X_ind}(data_trimmed{cell_ind}==2), data_trimmed{Y_ind}(data_trimmed{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
+                tmp_lymph_count = sum(tmp_lymph);
+                tbuffer_l_intersection{i}{j} = [tbuffer_l_intersection{i}{j} tmp];
+                tbuffer_l_intersection_area{i}{j} = tbuffer_l_intersection_area{i}{j}+area(tmp);
+                tbuffer_l_intersection_lymph_count{i}{j} = tbuffer_l_intersection_lymph_count{i}{j} + tmp_lymph_count;
+                
+                [x,y] = centroid(lymphocyte_polygon{i}{k});
+                tmp_l_centroid = [tmp_l_centroid; [x,y]];
+                tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_buffer_in{i}{j}.Vertices(:,1), tumour_buffer_in{i}{j}.Vertices(:,2));
+                tmp_l_centroid_count = sum(tmp_centroid_in);
+                tbuffer_l_centroid_count{i}{j} = tbuffer_l_centroid_count{i}{j} + tmp_l_centroid_count;
+                
+                
+                
+            end
         end
     end
-end
+    
+    %save([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection20200.mat'], 'tbuffer_l_intersection');
+    
+    tbuffer_l_intersection_lymph_count_cell = extractmycells(tbuffer_l_intersection_lymph_count);
+    tbuffer_l_intersection_area_cell = extractmycells(tbuffer_l_intersection_area);
+    tbuffer_l_centroid_count_cell = extractmycells(tbuffer_l_centroid_count);
+    
+    %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count20200.csv'], tbuffer_l_intersection_lymph_count_cell);
+    csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_lymphbuffer_intersection_count20200.csv'], tbuffer_l_intersection_lymph_count_cell);
+    %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area20200.csv'], tbuffer_l_intersection_area_cell);
+    csvwrite(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/area/' num2str(image_filenumber) '_intersectionbuffer_area20200.csv'], tbuffer_l_intersection_area_cell);
+    %csvwrite([output_dir '/outputfiles_tum_lymph/' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroidbuffer_count20200.csv'], tbuffer_l_centroid_count_cell);
+    csvwrite([ '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/count/' num2str(image_filenumber) '_centroidbuffer_count20200.csv'], tbuffer_l_centroid_count_cell);
+    
 
-save(['./' num2str(image_filenumber) '/t_l_intersection.mat'], 't_l_intersection');
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count.csv'], t_l_intersection_lymph_count);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area.csv'], t_l_intersection_area);
 
 
 %%
@@ -762,12 +892,12 @@ lymphocyte_polygon_area_combined=horzcat(lymphocyte_polygon_area{:});
 lymphocyte_polygon_area_combined(cellfun(@isempty, lymphocyte_polygon_area_combined))=[];
 
 %turn into csv files
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_in.csv'], tumour_in_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_buffer.csv'], tumour_buffer_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_core_area.csv'], core_area_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_area.csv'], lymphocyte_polygon_area_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_in.csv'], tumour_in_area_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_area_buffer200.csv'], tumour_buffer_area_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_core_area.csv'], core_area_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_area20.csv'], lymphocyte_polygon_area_combined);
 
-%% 
+%%
 %get the lymphocyte counts as well as tumour cell count
 for i = 1:size(tumour_core_list, 2)
     for j = 1:size(tumour_polygon_in{tumour_core_list(i)}, 2)
@@ -814,16 +944,16 @@ tumourcell_buffer_count_combined=horzcat(tumourcell_buffer_count{:});
 lymph_lymphcluster_count_combined = horzcat(lymph_lymphcluster_count{:});
 
 %turn into csv files
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_in_count.csv'], lymph_in_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_buffer_count.csv'], lymph_buffer_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_in_count.csv'], tumourcell_in_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_buffer_count.csv'], tumourcell_buffer_count_combined);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_lymphcluster_count.csv'], lymph_lymphcluster_count_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_in_count20.csv'], lymph_in_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_buffer_count20200.csv'], lymph_buffer_count_combined);
+% csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_in_count.csv'], tumourcell_in_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumourcell_buffer_count200.csv'], tumourcell_buffer_count_combined);
+csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_lymphcluster_count20.csv'], lymph_lymphcluster_count_combined);
 
 %% clear workspace before next image when using the for loop
 
-% save(image_list, 'image_list')
-% clear all
-% load('image_list')
+save(image_list, 'image_list')
+clear all
+load('image_list')
 
 end

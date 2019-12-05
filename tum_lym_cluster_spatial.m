@@ -107,7 +107,7 @@ for image = 1:size(image_list, 2)
             
             
             
-            clear the centroid tmp measurements
+%             clear the centroid tmp measurements
             tmp_l_centroid_count = [];
             tmp_l_centroid = [];
             

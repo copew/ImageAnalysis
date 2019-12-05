@@ -550,6 +550,7 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
             end
             tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
             tmp_lymph_count = sum(tmp_lymph);
+            tmp_l_centroid = [];
             [x,y] = centroid(lymphocyte_polygon{i}{k});
             tmp_l_centroid = [tmp_l_centroid; [x,y]];
             tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));

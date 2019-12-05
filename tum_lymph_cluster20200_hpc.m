@@ -334,7 +334,7 @@ end
 % each list. then work out the difference and append.
 
 if exist('this_lymphocyte_cluster_boundary', 'var') == 0
-    save(['./' num2str(image_filenumber) '/workspace_clusters20.mat']);
+    save(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace_clusters20.mat']);
     lymphocyte_polygon = [];
     t_l_intersection = [];
     tbuffer_l_intersection = [];
@@ -617,13 +617,14 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
             if tmp.NumRegions == 0
                 continue
             end
+            tmp_l_centroid=[];
             tmp_lymph = inpolygon(in_core{overlap_list(i)}{X_ind}(in_core{overlap_list(i)}{cell_ind}==2), in_core{overlap_list(i)}{Y_ind}(in_core{overlap_list(i)}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
             tmp_lymph_count = sum(tmp_lymph);
-            [x,y] = centroid(lymphocyte_polygon{i}{k});
+            [x,y] = centroid(lymphocyte_polygon{overlap_list(i)}{k});
             tmp_l_centroid = [tmp_l_centroid; [x,y]];
-            tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_buffer_in{i}{j}.Vertices(:,1), tumour_buffer_in{i}{j}.Vertices(:,2));
+            tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_buffer_in{overlap_list(i)}{j}.Vertices(:,1), tumour_buffer_in{overlap_list(i)}{j}.Vertices(:,2));
             tmp_l_centroid_count = sum(tmp_centroid_in);
-            tbuffer_l_centroid_count{i}{j} = tbuffer_l_centroid_count{i}{j} + tmp_l_centroid_count;
+            tbuffer_l_centroid_count{overlap_list(i)}{j} = tbuffer_l_centroid_count{overlap_list(i)}{j} + tmp_l_centroid_count;
             
             tbuffer_l_intersection{overlap_list(i)} = [tbuffer_l_intersection{overlap_list(i)} tmp];
             tbuffer_l_intersection_area{overlap_list(i)} = [tbuffer_l_intersection_area{overlap_list(i)} area(tmp)];

@@ -13,7 +13,20 @@
 %% A test list of images
 % these are distinct ones with different IT/PT distribution
 % image_list=[603288, 593987, 619857, 619872, 619905, 625951];
-%image_list=[603288];
+
+
+%% this is for debugging purpose
+% % % % image_list=[619872];
+% % % % 
+% % % % for image = 1:size(image_list,2)
+% % % % image_filenumber = image_list(image);
+% % % % 
+% % % % image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+% % % % 
+% % % % data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']); 
+% % % % image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+% % % % 
+
 
 %% load images and fits files
 
@@ -33,26 +46,26 @@ elseif isnumeric(image_filenumber_fullpath)
     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
 end
 
-% for image = 1:size(image_list,2)
-% image_filenumber = image_list(image);
+% loading files
+%data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+%info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+%
+data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+% comment from function to here for debugging
+
+% make a folder to save files
+mkdir(num2str(image_filenumber))
+
+%% set parameters and index
 
 % set parameters
 cluster_size = [5];
 lymph_cluster_size = [5];
 buffer_size = 100;
 
-% make a folder to save files
-mkdir(num2str(image_filenumber))
-
-% loading files
-%data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-%info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-
-data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
-
-%create indexing
+% and index
 X_ind = 1;
 Y_ind = 2;
 cell_ind = 3;
@@ -591,6 +604,10 @@ for i=1:size(tumour_polygon_in, 2) %selecting cores with tumour polygons
         t_l_intersection_lymph_count{i}{j}  = 0;
         t_l_centroid_count{i}{j} = 0; 
         
+        if isempty(tumour_polygon_in{i}{j})
+            continue
+        end
+        
         for k = 1:size(lymphocyte_polygon{i}, 2) 
             if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
                 t_l_intersection{i} = cell(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
@@ -655,9 +672,13 @@ for i=1:size(tumour_buffer_in, 2) %selecting cores with tumour polygons
         tbuffer_l_intersection{i}{j} = polyshape(); %make sure it's empty
         tbuffer_l_intersection_area{i}{j} = 0;
         tbuffer_l_intersection_lymph_count{i}{j}  = 0;
-        tbuffer_l_centroid_count{i}{j} = 0; 
+        tbuffer_l_centroid_count{i}{j} = 0;
         
-        for k = 1:size(lymphocyte_polygon{i}, 2) 
+        if isempty(tumour_buffer_in{i}{j})
+            continue
+        end
+        
+        for k = 1:size(lymphocyte_polygon{i}, 2)
             if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
                 tbuffer_l_intersection{i} = cell(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));
                 tbuffer_l_intersection_area{i} = zeros(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));

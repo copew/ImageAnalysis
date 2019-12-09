@@ -596,7 +596,7 @@ save(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '
 csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count20200.csv'], t_l_intersection_lymph_count);
 csvwrite(['./output20200/' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area20200.csv'], t_l_intersection_area);
 
-
+cd ..
 
 % now the buffer and lymphocyte polygons
 for i=1:size(overlap_list, 2) %looking at the cores with tumours
@@ -609,6 +609,7 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
         if isempty(tumour_buffer_in{overlap_list(i)}{j})
             continue
         end
+        
         for k = 1:size(lymphocyte_polygon{overlap_list(i)}, 2)
             if isempty(lymphocyte_polygon{overlap_list(i)}{k})
                 continue
@@ -625,7 +626,6 @@ for i=1:size(overlap_list, 2) %looking at the cores with tumours
             tmp_centroid_in = inpolygon(tmp_l_centroid(:,1), tmp_l_centroid(:,2), tumour_buffer_in{overlap_list(i)}{j}.Vertices(:,1), tumour_buffer_in{overlap_list(i)}{j}.Vertices(:,2));
             tmp_l_centroid_count = sum(tmp_centroid_in);
             tbuffer_l_centroid_count{overlap_list(i)}{j} = tbuffer_l_centroid_count{overlap_list(i)}{j} + tmp_l_centroid_count;
-            
             tbuffer_l_intersection{overlap_list(i)} = [tbuffer_l_intersection{overlap_list(i)} tmp];
             tbuffer_l_intersection_area{overlap_list(i)} = [tbuffer_l_intersection_area{overlap_list(i)} area(tmp)];
             tbuffer_l_intersection_lymph_count{overlap_list(i)} = [tbuffer_l_intersection_lymph_count{overlap_list(i)} tmp_lymph_count];

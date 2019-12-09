@@ -42,7 +42,7 @@ lymph_cluster_size = [5];
 buffer_size = 100;
 
 % make a folder to save files
-
+mkdir(num2str(image_filenumber))
 
 % loading files
 %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');

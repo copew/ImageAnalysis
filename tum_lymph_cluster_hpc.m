@@ -10,49 +10,49 @@
 %clusters without any lymphocytes overlap and hence not a good idea. MOdification today is
 %to re-index overlap areas
 
-%% A test list of images
+%% A  list of images
 % these are distinct ones with different IT/PT distribution
 % image_list=[603288, 593987, 619857, 619872, 619905, 625951];
 
 
 %% this is for debugging purpose
-% % % % image_list=[619872];
-% % % % 
-% % % % for image = 1:size(image_list,2)
-% % % % image_filenumber = image_list(image);
-% % % % 
-% % % % image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-% % % % 
-% % % % data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']); 
-% % % % image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
-% % % % 
+image_list=[626172, 597786];
+
+for image = 1:size(image_list,2)
+image_filenumber = image_list(image);
+
+image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+
+data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']); 
+image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+
 
 
 %% load images and fits files
 
-function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-disp(image_filenumber_fullpath)
-disp(class(image_filenumber_fullpath))
-if ischar(image_filenumber_fullpath)
-    [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-    image_filenumber = str2num(image_filenumber);
-    if isempty(image_path_stem)
-        image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-        warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-    end
-elseif isnumeric(image_filenumber_fullpath)
-    image_filenumber = image_filenumber_fullpath;
-    image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-    warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
-
-% loading files
-%data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-%info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-%image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-%
-data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+% % % % % % % % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+% % % % % % % % disp(image_filenumber_fullpath)
+% % % % % % % % disp(class(image_filenumber_fullpath))
+% % % % % % % % if ischar(image_filenumber_fullpath)
+% % % % % % % %     [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+% % % % % % % %     image_filenumber = str2num(image_filenumber);
+% % % % % % % %     if isempty(image_path_stem)
+% % % % % % % %         image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% % % % % % % %         warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% % % % % % % %     end
+% % % % % % % % elseif isnumeric(image_filenumber_fullpath)
+% % % % % % % %     image_filenumber = image_filenumber_fullpath;
+% % % % % % % %     image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% % % % % % % %     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% % % % % % % % end
+% % % % % % % % 
+% % % % % % % % % loading files
+% % % % % % % % %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+% % % % % % % % %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+% % % % % % % % %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+% % % % % % % % %
+% % % % % % % % data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+% % % % % % % % image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %%%%%%%%%%%%%%%% comment from function to here for debugging
 

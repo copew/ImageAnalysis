@@ -53,7 +53,8 @@ end
 %
 data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
 image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
-% comment from function to here for debugging
+
+%%%%%%%%%%%%%%%% comment from function to here for debugging
 
 % make a folder to save files
 mkdir(num2str(image_filenumber))
@@ -605,6 +606,17 @@ for i=1:size(tumour_polygon_in, 2) %selecting cores with tumour polygons
         t_l_centroid_count{i}{j} = 0; 
         
         if isempty(tumour_polygon_in{i}{j})
+            continue
+        end
+        
+        %check if lymphocyte polygons even exist
+        if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
+            t_l_intersection{i} = cell(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            t_l_intersection_area{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            t_l_intersection_lymph_count{i}= zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            t_l_centroid_count{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            %this has made the corresponding cell for polygons, area and counts as
+            %empty or zero respectively
             continue
         end
         

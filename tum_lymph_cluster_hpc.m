@@ -16,725 +16,729 @@
 
 
 %% this is for debugging purpose
-image_list=[626172, 597786];
+image_list= [626172, 597786];
+% [603922];
 
 for image = 1:size(image_list,2)
-image_filenumber = image_list(image);
-
-image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-
-data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']); 
-image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
-
-
-
-%% load images and fits files
-
-% % % % % % % % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-% % % % % % % % disp(image_filenumber_fullpath)
-% % % % % % % % disp(class(image_filenumber_fullpath))
-% % % % % % % % if ischar(image_filenumber_fullpath)
-% % % % % % % %     [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-% % % % % % % %     image_filenumber = str2num(image_filenumber);
-% % % % % % % %     if isempty(image_path_stem)
-% % % % % % % %         image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-% % % % % % % %         warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-% % % % % % % %     end
-% % % % % % % % elseif isnumeric(image_filenumber_fullpath)
-% % % % % % % %     image_filenumber = image_filenumber_fullpath;
-% % % % % % % %     image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-% % % % % % % %     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-% % % % % % % % end
-% % % % % % % % 
-% % % % % % % % % loading files
-% % % % % % % % %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-% % % % % % % % %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-% % % % % % % % %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-% % % % % % % % %
-% % % % % % % % data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-% % % % % % % % image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
-
-%%%%%%%%%%%%%%%% comment from function to here for debugging
-
-% make a folder to save files
-mkdir(num2str(image_filenumber))
-
-%% set parameters and index
-
-% set parameters
-cluster_size = [5];
-lymph_cluster_size = [5];
-buffer_size = 100;
-
-% and index
-X_ind = 1;
-Y_ind = 2;
-cell_ind = 3;
-% overlap = 22;
-% s2n=61;
-
-%% tidying up data
-
-%trim data
-data_trimmed = data.data_mini;
-data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
-
-%remove non cells
-%remove overlaps
-%%remove low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush)
-% and combine tumour and normal
-
-%% Create a boundary around each core
-%xxxx run this next
-% First get the thumbnail
-image_info=imfinfo(image_path);
-thumbnail_height_scale_factor = image_info(1).Height/image_info(2).Height;
-thumbnail_width_scale_factor = image_info(1).Width/image_info(2).Width;
-thumbnail_overall_scale_factor = mean([thumbnail_height_scale_factor,thumbnail_width_scale_factor]);
-low_res_layer = length(image_info)-2;
-high_res_layer = 1;
-thumbnail_layer = 2;
-%By convention:
-% First level	Full resolution image
-% Second level	Thumbnail
-% Third level to N-2 Level	A reduction by a power of 2 (4:1 ratio, 16:1 ratio, 32:1 ratio, etc)
-% N-1 Level	Slide Label
-% N Level	Entire Slide with cropped region delineated in green
-%image_io=imread(image_path,'Index',low_res_layer);
-
-thumbnail_io=imread(image_path,'Index',thumbnail_layer);
-large_thumbnail_io = imresize(thumbnail_io,thumbnail_overall_scale_factor);
-
-%now try to convert to bw and then create boundary
-this_image = imbinarize(large_thumbnail_io); % Binarize the image on all three colour layers
-this_image_2 = any(~this_image,3); % Select positive pixels in any colour layer
-this_image_expanded = bwdist(this_image_2) <= 100; % Expand the image to allow 'almost connected' cells
-cc = bwconncomp(this_image_expanded,4); % Now work out connected clusters
-big_cluster = false(1,cc.NumObjects); % This bit rejects 'crud' outside of large areas
-for i = 1:cc.NumObjects
-    big_cluster(i) = size(cc.PixelIdxList{i},1) > 1000000; % Absolute value for quick first pass, need to improve this for applicability XXXFIXME
-end
-grain = cell(0);
-for i = 1:cc.NumObjects
-    if big_cluster(i)
-        grain{end+1} = false(size(this_image_2));
-        grain{end}(cc.PixelIdxList{i}) = true; % Now create logical images of each core
+    image_filenumber = image_list(image);
+    
+    image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+    
+    data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
+    image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    
+    
+    
+    %% load images and fits files
+    
+    % % % % % % % % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+    % % % % % % % % disp(image_filenumber_fullpath)
+    % % % % % % % % disp(class(image_filenumber_fullpath))
+    % % % % % % % % if ischar(image_filenumber_fullpath)
+    % % % % % % % %     [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+    % % % % % % % %     image_filenumber = str2num(image_filenumber);
+    % % % % % % % %     if isempty(image_path_stem)
+    % % % % % % % %         image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+    % % % % % % % %         warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+    % % % % % % % %     end
+    % % % % % % % % elseif isnumeric(image_filenumber_fullpath)
+    % % % % % % % %     image_filenumber = image_filenumber_fullpath;
+    % % % % % % % %     image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+    % % % % % % % %     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+    % % % % % % % % end
+    % % % % % % % %
+    % % % % % % % % % loading files
+    % % % % % % % % %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+    % % % % % % % % %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+    % % % % % % % % %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    % % % % % % % % %
+    % % % % % % % % data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+    % % % % % % % % image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+    
+    %%%%%%%%%%%%%%%% comment from function to here for debugging
+    
+    % make a folder to save files
+    mkdir(num2str(image_filenumber))
+    
+    %% set parameters and index
+    
+    % set parameters
+    cluster_size = [5];
+    lymph_cluster_size = [5];
+    buffer_size = 100;
+    
+    % and index
+    X_ind = 1;
+    Y_ind = 2;
+    cell_ind = 3;
+    % overlap = 22;
+    % s2n=61;
+    
+    %% tidying up data
+    
+    %trim data
+    data_trimmed = data.data_mini;
+    data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
+    
+    %remove non cells
+    %remove overlaps
+    %%remove low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush)
+    % and combine tumour and normal
+    
+    %% Create a boundary around each core
+    %xxxx run this next
+    % First get the thumbnail
+    image_info=imfinfo(image_path);
+    thumbnail_height_scale_factor = image_info(1).Height/image_info(2).Height;
+    thumbnail_width_scale_factor = image_info(1).Width/image_info(2).Width;
+    thumbnail_overall_scale_factor = mean([thumbnail_height_scale_factor,thumbnail_width_scale_factor]);
+    low_res_layer = length(image_info)-2;
+    high_res_layer = 1;
+    thumbnail_layer = 2;
+    %By convention:
+    % First level	Full resolution image
+    % Second level	Thumbnail
+    % Third level to N-2 Level	A reduction by a power of 2 (4:1 ratio, 16:1 ratio, 32:1 ratio, etc)
+    % N-1 Level	Slide Label
+    % N Level	Entire Slide with cropped region delineated in green
+    %image_io=imread(image_path,'Index',low_res_layer);
+    
+    thumbnail_io=imread(image_path,'Index',thumbnail_layer);
+    large_thumbnail_io = imresize(thumbnail_io,thumbnail_overall_scale_factor);
+    
+    %now try to convert to bw and then create boundary
+    this_image = imbinarize(large_thumbnail_io); % Binarize the image on all three colour layers
+    this_image_2 = any(~this_image,3); % Select positive pixels in any colour layer
+    this_image_expanded = bwdist(this_image_2) <= 100; % Expand the image to allow 'almost connected' cells
+    cc = bwconncomp(this_image_expanded,4); % Now work out connected clusters
+    big_cluster = false(1,cc.NumObjects); % This bit rejects 'crud' outside of large areas
+    for i = 1:cc.NumObjects
+        big_cluster(i) = size(cc.PixelIdxList{i},1) > 1000000; % Absolute value for quick first pass, need to improve this for applicability XXXFIXME
     end
-end
-this_boundary = cell(size(grain));
-for i = 1:size(grain,2)
-    clear row col % Now for each core work out a starting point for boundary determination
-    for j = 1:size(grain{i},2)
-        row = min(find(grain{i}(:,j)));
-        if row
-            break
+    grain = cell(0);
+    for i = 1:cc.NumObjects
+        if big_cluster(i)
+            grain{end+1} = false(size(this_image_2));
+            grain{end}(cc.PixelIdxList{i}) = true; % Now create logical images of each core
         end
     end
-    col = j;
-    this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
-end
-
-%     figure % Plot the results for sanity
-%     imshow(large_thumbnail_io)
-%     hold on;
-%
-%     %for i = 1:size(grain,2)
-%         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
-%     %end
-
-% Now convert each into a polygon
-core_polygon= cell(0);
-for i = 1:size(this_boundary, 2)
-    core_polygon{i} = polyshape (this_boundary{i}(:,2),this_boundary{i}(:,1)); %note the doordinate is this way round
-    %plot(core_polygon{i}); %in case the coordinates flipped
-end
-
-
-% the useful output of this chunck is the core_polygon cell array
-
-%% now subset coordinates of cells
-in_polygon=cell(0);
-in_core=cell(0);
-
-for i = 1:size(core_polygon, 2)
-    in_polygon{i} = inpolygon(data_trimmed{X_ind}, data_trimmed{Y_ind}, core_polygon{i}.Vertices(:,1), core_polygon{i}.Vertices(:,2));
-    for j = 1:size(data_trimmed, 2)
-        in_core{i}{j} = data_trimmed{j}(in_polygon{i}, :);
-    end
-end
-
-%save(['./' num2str(image_filenumber) '/workspace1.mat']);
-
-%% clear and reload workspace for subsequent work
-
-% for final code, change reload workspace to =0 to skip this step (true or 1, false or 0)
-reload_workspace = 0;
-if reload_workspace
-    save('image_filenumber','image_filenumber');
-    clear variables;
-    load('image_filenumber');
-    load(['./' num2str(image_filenumber) '/workspace.mat']);
-end
-
-
-%% Now compute the tumour and lymphocyte clusters with subsetting
-
-%24th july 2019: changed epsilon to epsilon/2, now works well.  epsilon*3/4 is not very
-%tight, and epsilon/3 is splitting up lymphoid aggregates into very silly small bits.
-%settle with epsilon/2
-
-core_list = [];
-
-for this_core = 1:size(core_polygon,2)
-    
-    %tumour clusters
-    
-    base_cells = in_core{this_core}{cell_ind}==1;
-    neighbour_cells = in_core{this_core}{cell_ind}==1;
-    
-    %ignore the really small chunks that has very few tumour cells
-    %             if size(in_core{this_core}{cell_ind}==1,1) < 10
-    %                 continue
-    %             end
-    
-    [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', cluster_size+1);
-    
-    i = 0;
-    if size(all_multi_real_distances{this_core},1)<max(cluster_size)+1
-        all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(cluster_size)+1,:)=NaN;
-        this_tumour_cluster_boundary{this_core} = [];
-        continue;
+    this_boundary = cell(size(grain));
+    for i = 1:size(grain,2)
+        clear row col % Now for each core work out a starting point for boundary determination
+        for j = 1:size(grain{i},2)
+            row = min(find(grain{i}(:,j)));
+            if row
+                break
+            end
+        end
+        col = j;
+        this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
     end
     
-    %now use DBScan
-    for this_clustsize = cluster_size
-        i = i+1;
-        C=0;
+    %     figure % Plot the results for sanity
+    %     imshow(large_thumbnail_io)
+    %     hold on;
+    %
+    %     %for i = 1:size(grain,2)
+    %         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
+    %     %end
+    
+    % Now convert each into a polygon
+    core_polygon= cell(0);
+    for i = 1:size(this_boundary, 2)
+        core_polygon{i} = polyshape (this_boundary{i}(:,2),this_boundary{i}(:,1)); %note the doordinate is this way round
+        %plot(core_polygon{i}); %in case the coordinates flipped
+    end
+    
+    
+    % the useful output of this chunck is the core_polygon cell array
+    
+    %% now subset coordinates of cells
+    in_polygon=cell(0);
+    in_core=cell(0);
+    
+    for i = 1:size(core_polygon, 2)
+        in_polygon{i} = inpolygon(data_trimmed{X_ind}, data_trimmed{Y_ind}, core_polygon{i}.Vertices(:,1), core_polygon{i}.Vertices(:,2));
+        for j = 1:size(data_trimmed, 2)
+            in_core{i}{j} = data_trimmed{j}(in_polygon{i}, :);
+        end
+    end
+    
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
+    
+    %% clear and reload workspace for subsequent work
+    
+    % for final code, change reload workspace to =0 to skip this step (true or 1, false or 0)
+    reload_workspace = 0;
+    if reload_workspace
+        save('image_filenumber','image_filenumber');
+        clear variables;
+        load('image_filenumber');
+        load(['./' num2str(image_filenumber) '/workspace.mat']);
+    end
+    
+    
+    %% Now compute the tumour and lymphocyte clusters with subsetting
+    
+    %24th july 2019: changed epsilon to epsilon/2, now works well.  epsilon*3/4 is not very
+    %tight, and epsilon/3 is splitting up lymphoid aggregates into very silly small bits.
+    %settle with epsilon/2
+    
+    %core_list = [];
+    core_list=[1:1:size(core_polygon,2)];
+    
+    for this_core = 1:size(core_polygon,2)
         
-        n=sum(neighbour_cells);
-        cluster_membership{i}=zeros(n,1);
+        %tumour clusters
         
-        visited=false(n,1);
-        isnoise=false(n,1);
+        base_cells = in_core{this_core}{cell_ind}==1;
+        neighbour_cells = in_core{this_core}{cell_ind}==1;
         
-        %Calculate epsilon from the knee point of a
-        %1000-bin histogram to the k-1th nearest neighbour
-        %Remember that first index is self, so no need
-        %to subtract one.
-        [hist_y, hist_x] = hist(all_multi_real_distances{this_core}(this_clustsize,:),1000);
-        [epsilon, ~] = knee_pt(hist_y,hist_x,true);
+        %ignore the really small chunks that has very few tumour cells
+        %             if size(in_core{this_core}{cell_ind}==1,1) < 10
+        %                 continue
+        %             end
         
-        for this_cell=1:n
-            if ~visited(this_cell)
-                visited(this_cell)=true;
-                Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon,this_cell),this_cell)';
-                if numel(Neighbours)<this_clustsize
-                    % X(i,:) is NOISE
-                    isnoise(this_cell)=true;
-                else
-                    C=C+1;
-                    cluster_membership{i}(this_cell)=C;
-                    k = 1;
-                    while true
-                        this_neighbour_cell = Neighbours(k);
-                        
-                        if ~visited(this_neighbour_cell)
-                            visited(this_neighbour_cell)=true;
-                            Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon,this_neighbour_cell),this_neighbour_cell)';
-                            if numel(Neighbours2)>=this_clustsize
-                                Neighbours=[Neighbours Neighbours2];   %#ok
+        [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', cluster_size+1);
+        
+        i = 0;
+        if size(all_multi_real_distances{this_core},1)<max(cluster_size)+1
+            all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(cluster_size)+1,:)=NaN;
+            this_tumour_cluster_boundary{this_core} = [];
+            continue;
+        end
+        
+        %now use DBScan
+        for this_clustsize = cluster_size
+            i = i+1;
+            C=0;
+            
+            n=sum(neighbour_cells);
+            cluster_membership{i}=zeros(n,1);
+            
+            visited=false(n,1);
+            isnoise=false(n,1);
+            
+            %Calculate epsilon from the knee point of a
+            %1000-bin histogram to the k-1th nearest neighbour
+            %Remember that first index is self, so no need
+            %to subtract one.
+            [hist_y, hist_x] = hist(all_multi_real_distances{this_core}(this_clustsize,:),1000);
+            [epsilon, ~] = knee_pt(hist_y,hist_x,true);
+            
+            for this_cell=1:n
+                if ~visited(this_cell)
+                    visited(this_cell)=true;
+                    Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon,this_cell),this_cell)';
+                    if numel(Neighbours)<this_clustsize
+                        % X(i,:) is NOISE
+                        isnoise(this_cell)=true;
+                    else
+                        C=C+1;
+                        cluster_membership{i}(this_cell)=C;
+                        k = 1;
+                        while true
+                            this_neighbour_cell = Neighbours(k);
+                            
+                            if ~visited(this_neighbour_cell)
+                                visited(this_neighbour_cell)=true;
+                                Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon,this_neighbour_cell),this_neighbour_cell)';
+                                if numel(Neighbours2)>=this_clustsize
+                                    Neighbours=[Neighbours Neighbours2];   %#ok
+                                end
                             end
-                        end
-                        if cluster_membership{i}(this_neighbour_cell)==0
-                            cluster_membership{i}(this_neighbour_cell)=C;
-                        end
-                        
-                        k = k + 1;
-                        if k > numel(Neighbours)
-                            break;
+                            if cluster_membership{i}(this_neighbour_cell)==0
+                                cluster_membership{i}(this_neighbour_cell)=C;
+                            end
+                            
+                            k = k + 1;
+                            if k > numel(Neighbours)
+                                break;
+                            end
                         end
                     end
                 end
             end
+            
+            x_data_here = in_core{this_core}{X_ind}(neighbour_cells);
+            y_data_here = in_core{this_core}{Y_ind}(neighbour_cells);
+            
+            for this_cluster_number = 1:max(cluster_membership{i})
+                this_x_subset = x_data_here(cluster_membership{i}==this_cluster_number);
+                this_y_subset = y_data_here(cluster_membership{i}==this_cluster_number);
+                this_tumour_cluster_boundary_numbers = boundary(this_x_subset,this_y_subset);
+                this_tumour_cluster_boundary{this_core}{i}{this_cluster_number} = [this_x_subset(this_tumour_cluster_boundary_numbers),this_y_subset(this_tumour_cluster_boundary_numbers)];
+            end
+        end
+        % the output that feed into the next step is this_tumour_cluster_boundary
+        
+        
+        
+        % lymphocyte clusters
+        
+        base_cells = in_core{this_core}{cell_ind}==2;
+        neighbour_cells = in_core{this_core}{cell_ind}==2;
+        
+        %ignore the really small chunks that has very few lymph cells
+        %     if size(in_core{this_core}{cell_ind}==2,1) < 10
+        %         continue
+        %     end
+        
+        [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', lymph_cluster_size+1);
+        
+        i = 0;
+        if size(all_multi_real_distances{this_core},1)<max(lymph_cluster_size)+1
+            all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(lymph_cluster_size)+1,:)=NaN;
+            this_lymphocyte_cluster_boundary{this_core} = [];
+            continue;
         end
         
-        x_data_here = in_core{this_core}{X_ind}(neighbour_cells);
-        y_data_here = in_core{this_core}{Y_ind}(neighbour_cells);
-        
-        for this_cluster_number = 1:max(cluster_membership{i})
-            this_x_subset = x_data_here(cluster_membership{i}==this_cluster_number);
-            this_y_subset = y_data_here(cluster_membership{i}==this_cluster_number);
-            this_tumour_cluster_boundary_numbers = boundary(this_x_subset,this_y_subset);
-            this_tumour_cluster_boundary{this_core}{i}{this_cluster_number} = [this_x_subset(this_tumour_cluster_boundary_numbers),this_y_subset(this_tumour_cluster_boundary_numbers)];
+        %now use DBScan
+        for this_clustsize = lymph_cluster_size
+            i = i+1;
+            C=0;
+            
+            n=sum(neighbour_cells);
+            cluster_membership{i}=zeros(n,1);
+            
+            visited=false(n,1);
+            isnoise=false(n,1);
+            
+            %Calculate epsilon from the knee point of a
+            %1000-bin histogram to the k-1th nearest neighbour
+            %Remember that first index is self, so no need
+            %to subtract one.
+            %[hist_y, hist_x] = hist(all_multi_real_distances{this_core}(this_clustsize,:),1000);
+            [hist_y, hist_x] = hist(all_multi_real_distances{this_core}(3,:),1000);
+            [epsilon, ~] = knee_pt(hist_y,hist_x,true);
+            
+            for this_cell=1:n
+                if ~visited(this_cell)
+                    visited(this_cell)=true;
+                    Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon/2,this_cell),this_cell)';
+                    if numel(Neighbours)<this_clustsize
+                        % X(i,:) is NOISE
+                        isnoise(this_cell)=true;
+                    else
+                        C=C+1;
+                        cluster_membership{i}(this_cell)=C;
+                        k = 1;
+                        while true
+                            this_neighbour_cell = Neighbours(k);
+                            
+                            if ~visited(this_neighbour_cell)
+                                visited(this_neighbour_cell)=true;
+                                Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
+                                if numel(Neighbours2)>=this_clustsize
+                                    Neighbours=[Neighbours Neighbours2];   %#ok
+                                end
+                            end
+                            if cluster_membership{i}(this_neighbour_cell)==0
+                                cluster_membership{i}(this_neighbour_cell)=C;
+                            end
+                            
+                            k = k + 1;
+                            if k > numel(Neighbours)
+                                break;
+                            end
+                        end
+                    end
+                end
+            end
+            
+            x_data_here = in_core{this_core}{X_ind}(neighbour_cells);
+            y_data_here = in_core{this_core}{Y_ind}(neighbour_cells);
+            
+            for this_cluster_number = 1:max(cluster_membership{i})
+                this_x_subset = x_data_here(cluster_membership{i}==this_cluster_number);
+                this_y_subset = y_data_here(cluster_membership{i}==this_cluster_number);
+                this_lymphocyte_cluster_boundary_numbers = boundary(this_x_subset,this_y_subset);
+                this_lymphocyte_cluster_boundary{this_core}{i}{this_cluster_number} = [this_x_subset(this_lymphocyte_cluster_boundary_numbers),this_y_subset(this_lymphocyte_cluster_boundary_numbers)];
+            end
         end
+        
+        %core_list = [core_list this_core];
+        
     end
-    % the output that feed into the next step is this_tumour_cluster_boundary
     
     
-    
+    %% this bit is to match the dimension of the cluster boundaries with the core_list, as we
+    % may need empty cells at the end of the list for cores without either tumour clusters or
     % lymphocyte clusters
     
-    base_cells = in_core{this_core}{cell_ind}==2;
-    neighbour_cells = in_core{this_core}{cell_ind}==2;
+    % firstly work out the number of cores in total (max of core_total), and how many are in
+    % each list. then work out the difference and append.
+    tumour_core_total = size(this_tumour_cluster_boundary, 2);
+    lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
+    core_total = max(core_list);
     
-    %ignore the really small chunks that has very few tumour cells
-    if size(in_core{this_core}{cell_ind}==2,1) < 10
-        continue
+    % if same sizes then dont' worry about it....
+    if core_total == tumour_core_total
+        %do nothing
+    else
+        tumour_diff = core_total - tumour_core_total;
+        for diff = 1:tumour_diff
+            this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
+        end
     end
     
-    [all_multi_real_distances{this_core}, all_indexes{this_core}] = pdist2([in_core{this_core}{X_ind}(neighbour_cells) in_core{this_core}{Y_ind}(neighbour_cells)],[in_core{this_core}{X_ind}(base_cells) in_core{this_core}{Y_ind}(base_cells)],'euclidean','Smallest', lymph_cluster_size+1);
-    
-    i = 0;
-    if size(all_multi_real_distances{this_core},1)<max(lymph_cluster_size)+1
-        all_multi_real_distances{this_core}(size(all_multi_real_distances{this_core},1)+1:max(lymph_cluster_size)+1,:)=NaN;
-        this_lymphocyte_cluster_boundary{this_core} = [];
-        continue;
+    if core_total == lymph_core_total
+        %do nothing
+    else
+        lymph_diff = core_total - lymph_core_total;
+        for diff = 1:lymph_diff
+            this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
+        end
     end
     
-    %now use DBScan
-    for this_clustsize = lymph_cluster_size
-        i = i+1;
-        C=0;
+    
+    % save(['./' num2str(image_filenumber) '/'  num2str(image_filenumber) '_workspace_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat']);
+    
+    
+    %% now convert each into a polygon - old code
+    % %the this_tumour/lymphocyte_cluster_boundary is organised in such a way that it has core number
+    % %first, then some times it has extra layers before reaches the collection of number for
+    % %the clusters. so will unnest within each core
+    for i =1:size(core_list, 2) %First un-nest the cells
+        if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1
+            this_tumour_cluster_boundary{core_list(i)} = [];
+            continue
+        end
+        this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+    end
+    
+    for i =1:size(core_list, 2)
+        if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) ==1
+            %this_lymphocyte_cluster_boundary{core_list(i)} = [];
+            continue
+        end
+        this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
+    end
+    
+    
+    for i =1:size(core_list, 2)
+        if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1
+            tumour_polygon{core_list(i)} = []; 
+            continue
+        end
         
-        n=sum(neighbour_cells);
-        cluster_membership{i}=zeros(n,1);
-        
-        visited=false(n,1);
-        isnoise=false(n,1);
-        
-        %Calculate epsilon from the knee point of a
-        %1000-bin histogram to the k-1th nearest neighbour
-        %Remember that first index is self, so no need
-        %to subtract one.
-        %[hist_y, hist_x] = hist(all_multi_real_distances{this_core}(this_clustsize,:),1000);
-        [hist_y, hist_x] = hist(all_multi_real_distances{this_core}(3,:),1000);
-        [epsilon, ~] = knee_pt(hist_y,hist_x,true);
-        
-        for this_cell=1:n
-            if ~visited(this_cell)
-                visited(this_cell)=true;
-                Neighbours=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_cell)<=epsilon/2,this_cell),this_cell)';
-                if numel(Neighbours)<this_clustsize
-                    % X(i,:) is NOISE
-                    isnoise(this_cell)=true;
+        for j = 1:size(this_tumour_cluster_boundary{core_list(i)}, 2)
+            if isempty(this_tumour_cluster_boundary{core_list(i)}{j}) == 1
+                tumour_polygon{core_list(i)}{j} = [];
+                continue
+            end
+            tumour_polygon{core_list(i)}{j} = polyshape (this_tumour_cluster_boundary{core_list(i)}{j});
+            %plot(tumour_polygon{core_list(i)}{j});
+        end
+    end
+    
+    for i =1:size(core_list, 2)
+        if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1
+            lymphocyte_polygon{core_list(i)} = [];
+            continue
+        end
+        for k = 1:size(this_lymphocyte_cluster_boundary{core_list(i)}, 2)
+            if isempty(this_lymphocyte_cluster_boundary{core_list(i)}{k}) == 1
+                lymphocyte_polygon{core_list(i)}{k} = [];
+                continue
+            end
+            lymphocyte_polygon{core_list(i)}{k} = polyshape(this_lymphocyte_cluster_boundary{core_list(i)}{k});
+            %plot(tumour_polygon{core_list(i)}{j});
+        end
+    end
+    
+    
+    % % this bit of the code is
+    % % %the this_tumour/lymphocyte_cluster_boundary is organised in such a way that it has core number
+    % % %first, then some times it has extra layers before reaches the collection of number for
+    % % %the clusters. so will unnest within each core
+    % for i =1:size(core_list, 2) %First un-nest the cells
+    %     this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
+    %     this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
+    % end
+    % % %Then get rid of empty cells from the array. Note that this then makes the
+    % % %core_list not suitable for indexing through. Can't remove items from the
+    % % %core list because there might be some tumours empty with lymphocytes
+    % % %present etc.,
+    total_core_polygon = 1:size(this_tumour_cluster_boundary, 2);
+    
+    tumour_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_tumour_cluster_boundary))); %In case you need this later
+    % %this_tumour_cluster_boundary = this_tumour_cluster_boundary(~cellfun('isempty',this_tumour_cluster_boundary));
+    lymphocyte_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_lymphocyte_cluster_boundary))); %In case you need this later
+    % %this_lymphocyte_cluster_boundary = this_lymphocyte_cluster_boundary(~cellfun('isempty',this_lymphocyte_cluster_boundary));
+    %
+    % for i =1:size(this_tumour_cluster_boundary,2)
+    %     for j = 1:size(this_tumour_cluster_boundary{i}, 2)
+    %         try
+    %             warning('off','all')
+    %             tumour_polygon{i}{j} = polyshape(this_tumour_cluster_boundary{i}{j});
+    %             warning('on','all')
+    %         catch
+    %             warning('on','all')
+    %             warning(['Something went wrong with tumour polygons for core ' num2str(tumour_core_list(i)) ' moving on, the array is:'])
+    %             disp(this_tumour_cluster_boundary{i}{j})
+    %             continue
+    %         end
+    %         %plot(tumour_polygon{i}{j});
+    %     end
+    % end
+    %
+    % for i =1:size(this_lymphocyte_cluster_boundary,2)
+    %     for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
+    %         try
+    %             warning('off','all')
+    %             lymphocyte_polygon{i}{j} = polyshape(this_lymphocyte_cluster_boundary{i}{j});
+    %             warning('on','all')
+    %         catch
+    %             warning('on','all')
+    %             warning(['Something went wrong with lymphocyte polygons for core ' num2str(lymphocyte_core_list(i)) ' moving on, the array is:'])
+    %             disp(this_lymphocyte_cluster_boundary{i}{j})
+    %             continue
+    %         end
+    %         %plot(lymphocyte_polygon{i}{j});
+    %     end
+    % end
+    
+    %the end result is tumour_polygon, and lymphocyte_polygon
+    
+    %% sort out overlaps
+    
+    %need to work out tumour polygon if it overlaps.
+    %but the problem occurs at what to do with the old ones...
+    overlap = cell(0);
+    for i =1:size(tumour_polygon, 2)
+        for j = 1:size(tumour_polygon{i}, 2)
+            if isempty(tumour_polygon{i}{j})
+                continue
+            end
+            for k = (j+1):size(tumour_polygon{i}, 2)
+                if isempty(tumour_polygon{i}{k})
+                    continue
+                end
+                overlap{i}{j}{k} = inpolygon(tumour_polygon{i}{k}.Vertices(:,1), tumour_polygon{i}{k}.Vertices(:,2), tumour_polygon{i}{j}.Vertices(:,1), tumour_polygon{i}{j}.Vertices(:,2));
+                if sum(overlap{i}{j}{k})>0
+                    tumour_polygon{i}{j} = union(tumour_polygon{i}{j}, tumour_polygon{i}{k});
+                    tumour_polygon{i}{k} = [];
                 else
-                    C=C+1;
-                    cluster_membership{i}(this_cell)=C;
-                    k = 1;
-                    while true
-                        this_neighbour_cell = Neighbours(k);
-                        
-                        if ~visited(this_neighbour_cell)
-                            visited(this_neighbour_cell)=true;
-                            Neighbours2=setdiff(all_indexes{this_core}(all_multi_real_distances{this_core}(:,this_neighbour_cell)<=epsilon/2,this_neighbour_cell),this_neighbour_cell)';
-                            if numel(Neighbours2)>=this_clustsize
-                                Neighbours=[Neighbours Neighbours2];   %#ok
-                            end
-                        end
-                        if cluster_membership{i}(this_neighbour_cell)==0
-                            cluster_membership{i}(this_neighbour_cell)=C;
-                        end
-                        
-                        k = k + 1;
-                        if k > numel(Neighbours)
-                            break;
-                        end
-                    end
+                    continue;
                 end
             end
         end
         
-        x_data_here = in_core{this_core}{X_ind}(neighbour_cells);
-        y_data_here = in_core{this_core}{Y_ind}(neighbour_cells);
-        
-        for this_cluster_number = 1:max(cluster_membership{i})
-            this_x_subset = x_data_here(cluster_membership{i}==this_cluster_number);
-            this_y_subset = y_data_here(cluster_membership{i}==this_cluster_number);
-            this_lymphocyte_cluster_boundary_numbers = boundary(this_x_subset,this_y_subset);
-            this_lymphocyte_cluster_boundary{this_core}{i}{this_cluster_number} = [this_x_subset(this_lymphocyte_cluster_boundary_numbers),this_y_subset(this_lymphocyte_cluster_boundary_numbers)];
-        end
     end
     
-    core_list = [core_list this_core];
+    %%
+    %this bit then works out the buffer bit
     
-end
-
-
-%% this bit is to match the dimension of the cluster boundaries with the core_list, as we
-% may need empty cells at the end of the list for cores without either tumour clusters or
-% lymphocyte clusters
-
-% firstly work out the number of cores in total (max of core_total), and how many are in
-% each list. then work out the difference and append.
-tumour_core_total = size(this_tumour_cluster_boundary, 2);
-lymph_core_total = size(this_lymphocyte_cluster_boundary, 2);
-core_total = max(core_list);
-
-% if same sizes then dont' worry about it....
-if core_total == tumour_core_total
-    %do nothing
-else
-    tumour_diff = core_total - tumour_core_total;
-    for diff = 1:tumour_diff
-        this_tumour_cluster_boundary{1, tumour_core_total + diff} = [];
-    end
-end
-
-if core_total == lymph_core_total
-    %do nothing
-else
-    lymph_diff = core_total - lymph_core_total;
-    for diff = 1:lymph_diff
-        this_lymphocyte_cluster_boundary{1, lymph_core_total + diff} = [];
-    end
-end
-
-
-% save(['./' num2str(image_filenumber) '/'  num2str(image_filenumber) '_workspace_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat']);
-
-
-%% now convert each into a polygon - old code
-% %the this_tumour/lymphocyte_cluster_boundary is organised in such a way that it has core number
-% %first, then some times it has extra layers before reaches the collection of number for
-% %the clusters. so will unnest within each core
-for i =1:size(core_list, 2) %First un-nest the cells
-    if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
-        continue
-    end
-    this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
-end
-
-for i =1:size(core_list, 2)
-    if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) ==1;
-        continue
-    end
-    this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
-end
-
-
-for i =1:size(core_list, 2)
-    if isempty(this_tumour_cluster_boundary{core_list(i)}) == 1;
-        continue
-    end
-    
-    for j = 1:size(this_tumour_cluster_boundary{core_list(i)}, 2)
-        if isempty(this_tumour_cluster_boundary{core_list(i)}{j}) == 1
-            continue
-        end
-        tumour_polygon{core_list(i)}{j} = polyshape (this_tumour_cluster_boundary{core_list(i)}{j});
-        %plot(tumour_polygon{core_list(i)}{j});
-    end
-end
-
-for i =1:size(core_list, 2)
-    if isempty(this_lymphocyte_cluster_boundary{core_list(i)}) == 1;
-        continue
-    end
-    for k = 1:size(this_lymphocyte_cluster_boundary{core_list(i)}, 2)
-        if isempty(this_lymphocyte_cluster_boundary{core_list(i)}{k}) == 1
-            continue
-        end
-        lymphocyte_polygon{core_list(i)}{k} = polyshape (this_lymphocyte_cluster_boundary{core_list(i)}{k});
-        %plot(tumour_polygon{core_list(i)}{j});
-    end
-end
-
-
-% % this bit of the code is
-% % %the this_tumour/lymphocyte_cluster_boundary is organised in such a way that it has core number
-% % %first, then some times it has extra layers before reaches the collection of number for
-% % %the clusters. so will unnest within each core
-% for i =1:size(core_list, 2) %First un-nest the cells
-%     this_tumour_cluster_boundary{core_list(i)} = extractmycells(this_tumour_cluster_boundary{core_list(i)});
-%     this_lymphocyte_cluster_boundary{core_list(i)} = extractmycells(this_lymphocyte_cluster_boundary{core_list(i)});
-% end
-% % %Then get rid of empty cells from the array. Note that this then makes the
-% % %core_list not suitable for indexing through. Can't remove items from the
-% % %core list because there might be some tumours empty with lymphocytes
-% % %present etc.,
-total_core_polygon = 1:size(this_tumour_cluster_boundary, 2);
-
-tumour_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_tumour_cluster_boundary))); %In case you need this later
-% %this_tumour_cluster_boundary = this_tumour_cluster_boundary(~cellfun('isempty',this_tumour_cluster_boundary));
-lymphocyte_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_lymphocyte_cluster_boundary))); %In case you need this later
-% %this_lymphocyte_cluster_boundary = this_lymphocyte_cluster_boundary(~cellfun('isempty',this_lymphocyte_cluster_boundary));
-%
-% for i =1:size(this_tumour_cluster_boundary,2)
-%     for j = 1:size(this_tumour_cluster_boundary{i}, 2)
-%         try
-%             warning('off','all')
-%             tumour_polygon{i}{j} = polyshape(this_tumour_cluster_boundary{i}{j});
-%             warning('on','all')
-%         catch
-%             warning('on','all')
-%             warning(['Something went wrong with tumour polygons for core ' num2str(tumour_core_list(i)) ' moving on, the array is:'])
-%             disp(this_tumour_cluster_boundary{i}{j})
-%             continue
-%         end
-%         %plot(tumour_polygon{i}{j});
-%     end
-% end
-%
-% for i =1:size(this_lymphocyte_cluster_boundary,2)
-%     for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
-%         try
-%             warning('off','all')
-%             lymphocyte_polygon{i}{j} = polyshape(this_lymphocyte_cluster_boundary{i}{j});
-%             warning('on','all')
-%         catch
-%             warning('on','all')
-%             warning(['Something went wrong with lymphocyte polygons for core ' num2str(lymphocyte_core_list(i)) ' moving on, the array is:'])
-%             disp(this_lymphocyte_cluster_boundary{i}{j})
-%             continue
-%         end
-%         %plot(lymphocyte_polygon{i}{j});
-%     end
-% end
-
-%the end result is tumour_polygon, and lymphocyte_polygon
-
-%% sort out overlaps
-
-%need to work out tumour polygon if it overlaps.
-%but the problem occurs at what to do with the old ones...
-overlap = cell(0);
-for i =1:size(tumour_polygon, 2)
-    for j = 1:size(tumour_polygon{i}, 2)
-        if isempty(tumour_polygon{i}{j})
-            continue
-        end
-        for k = (j+1):size(tumour_polygon{i}, 2)
-            if isempty(tumour_polygon{i}{k})
+    tumour_buffer = cell(0);
+    for i = 1:size(tumour_polygon, 2)
+        for j = 1:size(tumour_polygon{i}, 2)
+            if isempty(tumour_polygon{i}{j})
                 continue
             end
-            overlap{i}{j}{k} = inpolygon(tumour_polygon{i}{k}.Vertices(:,1), tumour_polygon{i}{k}.Vertices(:,2), tumour_polygon{i}{j}.Vertices(:,1), tumour_polygon{i}{j}.Vertices(:,2));
-            if sum(overlap{i}{j}{k})>0
-                tumour_polygon{i}{j} = union(tumour_polygon{i}{j}, tumour_polygon{i}{k});
-                tumour_polygon{i}{k} = [];
-            else
-                continue;
-            end
+            tumour_buffer{i}{j} = polybuffer(tumour_polygon{i}{j},buffer_size);
+            %tumour_buffer{core_list(i)}{j} = polyshape(tumour_buffer{core_list(i)}{j});
+            %this is not necessary as it is already a polyshape
         end
     end
     
-end
-
-%%
-%this bit then works out the buffer bit
-
-tumour_buffer = cell(0);
-for i = 1:size(tumour_polygon, 2)
-    for j = 1:size(tumour_polygon{i}, 2)
-        if isempty(tumour_polygon{i}{j})
+    
+    %% exclude the area that falls outside the cores
+    %intersecting regions so only within core area is calculated
+    %
+    for i = 1:size(tumour_core_list, 2)
+        %     for j = 1:size(tumour_polygon{i}, 2)
+        %         if isempty(tumour_polygon{i}{j})
+        %             continue
+        %         end
+        %         tumour_polygon_in{i}{j} = intersect(tumour_polygon{i}{j}, core_polygon{tumour_core_list(i)});
+        %     end
+        % the above is unnecessary as only the buffer goes outside
+        if isempty(tumour_buffer{tumour_core_list(i)})
             continue
         end
-        tumour_buffer{i}{j} = polybuffer(tumour_polygon{i}{j},buffer_size);
-        %tumour_buffer{core_list(i)}{j} = polyshape(tumour_buffer{core_list(i)}{j});
-        %this is not necessary as it is already a polyshape
-    end
-end
-
-
-%% exclude the area that falls outside the cores
-%intersecting regions so only within core area is calculated
-%
-for i = 1:size(tumour_core_list, 2)
-    %     for j = 1:size(tumour_polygon{i}, 2)
-    %         if isempty(tumour_polygon{i}{j})
-    %             continue
-    %         end
-    %         tumour_polygon_in{i}{j} = intersect(tumour_polygon{i}{j}, core_polygon{tumour_core_list(i)});
-    %     end
-    % the above is unnecessary as only the buffer goes outside
-    if isempty(tumour_buffer{tumour_core_list(i)})
-        continue
-    end
-    for k = 1:size(tumour_buffer{tumour_core_list(i)},2)
-        if isempty(tumour_buffer{tumour_core_list(i)}{k})
-            continue
-        end
-        tumour_buffer_in{tumour_core_list(i)}{k} = intersect(tumour_buffer{tumour_core_list(i)}{k}, core_polygon{tumour_core_list(i)});
-    end
-end
-
-%thi sis just for the rest of the code
-tumour_polygon_in = tumour_polygon;
-
-%%
-%exclude the overlapped regions between the tumour and buffer
-%if tumour and buffer overlap: treat as tumour
-%if buffer and buffer overlap: just carry on as normal
-
-
-for i = 1:size(tumour_polygon, 2)
-    for j = 1:size(tumour_polygon_in{i}, 2)
-        if isempty(tumour_polygon_in{i}{j})
-            continue
-        end
-        for k = 1:size(tumour_buffer{i},2)
-            if isempty(tumour_buffer{i}{k})
+        for k = 1:size(tumour_buffer{tumour_core_list(i)},2)
+            if isempty(tumour_buffer{tumour_core_list(i)}{k})
                 continue
             end
-            tumour_buffer_in{i}{k} = subtract(tumour_buffer_in{i}{k}, tumour_polygon_in{i}{j});
+            tumour_buffer_in{tumour_core_list(i)}{k} = intersect(tumour_buffer{tumour_core_list(i)}{k}, core_polygon{tumour_core_list(i)});
         end
-    end
-end
-
-%% now save the files
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_polygon_in_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'tumour_polygon_in');
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_buffer_in_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'tumour_buffer_in');
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_polygon_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'lymphocyte_polygon');
-
-%% looking at spatial relationship between tumour clusters and lymphocyte clusters
-
-% indexing using tumour polygons
-
-t_l_intersection = [];
-t_l_intersection_area=[];
-t_l_intersection_lymph_count= [];
-t_l_centroid_count = [];
-
-for i=1:size(tumour_polygon_in, 2) %selecting cores with tumour polygons
-    if isempty(tumour_polygon_in{i}) %in case some cores dont' have tumour
-        continue
     end
     
-    for j = 1:size(tumour_polygon_in{i}, 2) %indexing with tumour polygons
-        t_l_intersection{i}{j} = polyshape(); %make sure it's empty
-        t_l_intersection_area{i}{j} = 0;
-        t_l_intersection_lymph_count{i}{j}  = 0;
-        t_l_centroid_count{i}{j} = 0; 
-        
-        if isempty(tumour_polygon_in{i}{j})
+    %thi sis just for the rest of the code
+    tumour_polygon_in = tumour_polygon;
+    
+    %%
+    %exclude the overlapped regions between the tumour and buffer
+    %if tumour and buffer overlap: treat as tumour
+    %if buffer and buffer overlap: just carry on as normal
+    
+    
+    for i = 1:size(tumour_polygon, 2)
+        for j = 1:size(tumour_polygon_in{i}, 2)
+            if isempty(tumour_polygon_in{i}{j})
+                continue
+            end
+            for k = 1:size(tumour_buffer{i},2)
+                if isempty(tumour_buffer{i}{k})
+                    continue
+                end
+                tumour_buffer_in{i}{k} = subtract(tumour_buffer_in{i}{k}, tumour_polygon_in{i}{j});
+            end
+        end
+    end
+    
+    
+    %% now save the files
+    save(['./' num2str(image_filenumber) '/'  num2str(image_filenumber) '_workspace_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat']);
+    
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_polygon_in_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'tumour_polygon_in');
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_buffer_in_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'tumour_buffer_in');
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphocyte_polygon_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.mat'], 'lymphocyte_polygon');
+    
+    %% looking at spatial relationship between tumour clusters, buffer and lymphocyte clusters
+    
+    % indexing using tumour polygons
+    
+    t_l_intersection = {};
+    t_l_intersection_area={};
+    t_l_intersection_lymph_count_logi={};
+    t_l_intersection_lymph_count= {};
+    t_l_centroid_count = {};
+    
+    tbuffer_l_intersection = {};
+    tbuffer_l_intersection_area={};
+    tbuffer_l_intersection_lymph_count_logi={};
+    tbuffer_l_intersection_lymph_count= {};
+    tbuffer_l_centroid_count = {};
+    
+    lymph_centroid_in = {};
+    lymph_centroid_buffer = {};
+    lymph_centroid_in_logi = {};
+    lymph_centroid_buffer_logi = {};
+    
+    for i=1:size(tumour_polygon_in, 2) %selecting cores with tumour polygons
+        if isempty(tumour_polygon_in{i}) %in case some cores dont' have tumour
             continue
         end
+        %         t_l_intersection{i} = [];
+        %         t_l_intersection_area{i}={};
+        %         t_l_intersection_lymph_count{i}= {};
+        %         t_l_centroid_count{i} = {};
         
-        %check if lymphocyte polygons even exist
         if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
             t_l_intersection{i} = cell(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
             t_l_intersection_area{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
             t_l_intersection_lymph_count{i}= zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
             t_l_centroid_count{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            tbuffer_l_intersection{i} = cell(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            tbuffer_l_intersection_area{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            tbuffer_l_intersection_lymph_count{i}= zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
+            tbuffer_l_centroid_count{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
             %this has made the corresponding cell for polygons, area and counts as
             %empty or zero respectively
             continue
         end
         
-        for k = 1:size(lymphocyte_polygon{i}, 2) 
-            if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
-                t_l_intersection{i} = cell(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
-                t_l_intersection_area{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
-                t_l_intersection_lymph_count{i}= zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
-                t_l_centroid_count{i} = zeros(size(tumour_polygon_in{i}, 1), size(tumour_polygon_in{i}, 2));
-                %this has made the corresponding cell for polygons, area and counts as
-                %empty or zero respectively
+        for j = 1:size(tumour_polygon_in{i}, 2) %indexing with tumour polygons
+            t_l_intersection{i}{j} = polyshape(); %make sure it's empty
+            t_l_intersection_area{i}{j} = [];
+            t_l_intersection_lymph_count_logi{i}{j}= [];
+            t_l_intersection_lymph_count{i}{j}  = [];
+            t_l_centroid_count{i}{j} = [];
+            tbuffer_l_intersection{i}{j} = polyshape(); %make sure it's empty
+            tbuffer_l_intersection_area{i}{j} = [];
+            tbuffer_l_intersection_lymph_count_logi{i}{j}=[];
+            tbuffer_l_intersection_lymph_count{i}{j}  = [];
+            tbuffer_l_centroid_count{i}{j} = [];
+            lymph_centroid_in{i}{j} = [];
+            lymph_centroid_buffer{i}{j} = [];
+            lymph_centroid_in_logi{i}{j} = [];
+            lymph_centroid_buffer_logi{i}{j} = [];
+            
+            if isempty(tumour_polygon_in{i}{j})
                 continue
             end
             
-            %now looking at the overlap between the particular lymphocyte polygon and
-            %tumour polygon
             
-            tmp = intersect(tumour_polygon_in{i}{j}, lymphocyte_polygon{i}{k});
-            if tmp.NumRegions == 0
-                %if no actual overlap at all then move on
+            for k = 1:size(lymphocyte_polygon{i}, 2)
+                %now looking at the overlap between the particular lymphocyte polygon and
+                %tumour polygon
+                tmp = intersect(tumour_polygon_in{i}{j}, lymphocyte_polygon{i}{k});
+                if tmp.NumRegions == 0
+                    %if no actual overlap at all then move on
+                    continue
+                end
+                t_l_intersection{i}{j} = union(t_l_intersection{i}{j}, tmp); %a collection of polygons of t_l overlap
+                [x,y] = centroid(lymphocyte_polygon{i}{k}); %a collection of centroid of the lymphoid polygons that have overlaps with this tumour cluster
+                lymph_centroid_in{i}{j} = [lymph_centroid_in{i}{j}; [x,y]];
+            end
+            t_l_intersection_lymph_count_logi{i}{j} = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), t_l_intersection{i}{j}.Vertices(:,1), t_l_intersection{i}{j}.Vertices(:,2));
+            t_l_intersection_lymph_count{i}{j} = sum(t_l_intersection_lymph_count_logi{i}{j});
+            t_l_intersection_area{i}{j} = area(t_l_intersection{i}{j});
+            
+            if isempty(lymph_centroid_in{i}{j})
+                lymph_centroid_in_logi{i}{j} = 0;
+                t_l_centroid_count{i}{j} = 0;
                 continue
             end
             
-            tmp_lymph = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
-            tmp_lymph_count = sum(tmp_lymph); % number of lymph from polygon k in tumour polygon j
-            t_l_intersection{i}{j} = union(t_l_intersection{i}{j}, tmp); %a collection of polygons of t_l overlap
-            t_l_intersection_area{i}{j} = t_l_intersection_area{i}{j} + area(tmp);
-            t_l_intersection_lymph_count{i}{j} = t_l_intersection_lymph_count{i}{j} + tmp_lymph_count;
+            lymph_centroid_in_logi{i}{j} = inpolygon(lymph_centroid_in{i}{j}(:,1), lymph_centroid_in{i}{j}(:,2), tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));
+            t_l_centroid_count{i}{j} = sum(lymph_centroid_in_logi{i}{j});
             
-            [x,y] = centroid(lymphocyte_polygon{i}{k});
-            tmp_centroid_in = inpolygon(x, y, tumour_polygon_in{i}{j}.Vertices(:,1), tumour_polygon_in{i}{j}.Vertices(:,2));
-            tmp_centroid_count = sum(tmp_centroid_in);
-            t_l_centroid_count{i}{j} = t_l_centroid_count{i}{j} + tmp_centroid_count;
+            
+            for l = 1:size(lymphocyte_polygon{i}, 2)
+                %now looking at the overlap between the particular lymphocyte polygon and
+                %tumour buffer
+                tmpb = intersect(tumour_buffer_in{i}{j}, lymphocyte_polygon{i}{l});
+                if tmpb.NumRegions == 0
+                    %if no actual overlap at all then move on
+                    continue
+                end
+                tbuffer_l_intersection{i}{j} = union(tbuffer_l_intersection{i}{j}, tmpb); %a collection of polygons of t_l overlap
+                [x,y] = centroid(lymphocyte_polygon{i}{l}); %a collection of centroid of the lymphoid polygons that have overlaps with this tumour cluster
+                lymph_centroid_buffer{i}{j} = [lymph_centroid_buffer{i}{j}; [x,y]];
+            end
+            
+            tbuffer_l_intersection_lymph_count_logi{i}{j} = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), tbuffer_l_intersection{i}{j}.Vertices(:,1), tbuffer_l_intersection{i}{j}.Vertices(:,2));
+            tbuffer_l_intersection_lymph_count{i}{j} = sum(tbuffer_l_intersection_lymph_count_logi{i}{j});
+            tbuffer_l_intersection_area{i}{j} = area(tbuffer_l_intersection{i}{j});
+            
+            if isempty(lymph_centroid_buffer{i}{j})
+                lymph_centroid_buffer_logi{i}{j} = 0;
+                tbuffer_l_centroid_count{i}{j} = 0;
+                continue
+            end
+            lymph_centroid_buffer_logi{i}{j} = inpolygon(lymph_centroid_buffer{i}{j}(:,1), lymph_centroid_buffer{i}{j}(:,2), tumour_buffer_in{i}{j}.Vertices(:,1), tumour_buffer_in{i}{j}.Vertices(:,2));
+            tbuffer_l_centroid_count{i}{j} = sum(lymph_centroid_buffer_logi{i}{j});
             
         end
-    end
-end
-
-%converting this to csv compatible format
-t_l_intersection_lymph_count_cell = extractmycells(t_l_intersection_lymph_count);
-t_l_intersection_area_cell = extractmycells(t_l_intersection_area);
-t_l_centroid_count_cell = extractmycells(t_l_centroid_count);
-
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.mat'], 't_l_intersection');
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], t_l_intersection_lymph_count_cell);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.csv'], t_l_intersection_area_cell);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroid_in_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], t_l_centroid_count_cell);
-
-
-%% looking at spatial relationship between tumour clusters buffer and lymphocyte clusters
-
-% indexing using tumour polygons
-
-tbuffer_l_intersection = [];
-tbuffer_l_intersection_area=[];
-tbuffer_l_intersection_lymph_count= [];
-tbuffer_l_centroid_count = [];
-
-for i=1:size(tumour_buffer_in, 2) %selecting cores with tumour polygons
-    if isempty(tumour_buffer_in{i}) %in case some cores dont' have tumour
-        continue
     end
     
-    for j = 1:size(tumour_buffer_in{i}, 2) %indexing with tumour polygons
-        tbuffer_l_intersection{i}{j} = polyshape(); %make sure it's empty
-        tbuffer_l_intersection_area{i}{j} = 0;
-        tbuffer_l_intersection_lymph_count{i}{j}  = 0;
-        tbuffer_l_centroid_count{i}{j} = 0;
-        
-        if isempty(tumour_buffer_in{i}{j})
-            continue
-        end
-        
-        for k = 1:size(lymphocyte_polygon{i}, 2)
-            if isempty(lymphocyte_polygon{i}) %if there is no lymphocyte in this core then all value for this becomes empty
-                tbuffer_l_intersection{i} = cell(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));
-                tbuffer_l_intersection_area{i} = zeros(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));
-                tbuffer_l_intersection_lymph_count{i}= zeros(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));
-                tbuffer_l_centroid_count{i} = zeros(size(tumour_buffer_in{i}, 1), size(tumour_buffer_in{i}, 2));
-                %this has made the corresponding cell for polygons, area and counts as
-                %empty or zero respectively
-                continue
-            end
-            
-            %now looking at the overlap between the particular lymphocyte polygon and
-            %tumour polygon
-            
-            tmp = intersect(tumour_buffer_in{i}{j}, lymphocyte_polygon{i}{k});
-            if tmp.NumRegions == 0
-                %if no actual overlap at all then move on
-                continue
-            end
-            
-            tmp_lymph = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), tmp.Vertices(:,1), tmp.Vertices(:,2));
-            tmp_lymph_count = sum(tmp_lymph); % number of lymph from polygon k in tumour polygon j
-            tbuffer_l_intersection{i}{j} = union(tbuffer_l_intersection{i}{j}, tmp); %a collection of polygons of t_l overlap
-            tbuffer_l_intersection_area{i}{j} = tbuffer_l_intersection_area{i}{j} + area(tmp);
-            tbuffer_l_intersection_lymph_count{i}{j} = tbuffer_l_intersection_lymph_count{i}{j} + tmp_lymph_count;
-            
-            [x,y] = centroid(lymphocyte_polygon{i}{k});
-            tmp_centroid_in = inpolygon(x, y, tumour_buffer_in{i}{j}.Vertices(:,1), tumour_buffer_in{i}{j}.Vertices(:,2));
-            tmp_centroid_count = sum(tmp_centroid_in);
-            tbuffer_l_centroid_count{i}{j} = tbuffer_l_centroid_count{i}{j} + tmp_centroid_count;
-            
-        end
-    end
-end
-
-%converting this to csv compatible format
-tbuffer_l_intersection_lymph_count_cell = extractmycells(tbuffer_l_intersection_lymph_count);
-tbuffer_l_intersection_area_cell = extractmycells(tbuffer_l_intersection_area);
-tbuffer_l_centroid_count_cell = extractmycells(tbuffer_l_centroid_count);
-
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.mat'], 'tbuffer_l_intersection');
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], tbuffer_l_intersection_lymph_count_cell);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.csv'], tbuffer_l_intersection_area_cell);
-csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroidbuffer_in_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], tbuffer_l_centroid_count_cell);
-
+    %converting this to csv compatible format
+    t_l_intersection_lymph_count_cell = extractmycells(t_l_intersection_lymph_count);
+    t_l_intersection_area_cell = extractmycells(t_l_intersection_area);
+    t_l_centroid_count_cell = extractmycells(t_l_centroid_count);
+    
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_t_l_intersection_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.mat'], 't_l_intersection');
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymph_intersection_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], t_l_intersection_lymph_count_cell);
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersection_area_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.csv'], t_l_intersection_area_cell);
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroid_in_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], t_l_centroid_count_cell);
+    
+    
+    %converting this to csv compatible format
+    tbuffer_l_intersection_lymph_count_cell = extractmycells(tbuffer_l_intersection_lymph_count);
+    tbuffer_l_intersection_area_cell = extractmycells(tbuffer_l_intersection_area);
+    tbuffer_l_centroid_count_cell = extractmycells(tbuffer_l_centroid_count);
+    
+    save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tbuffer_l_intersection_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.mat'], 'tbuffer_l_intersection');
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_lymphbuffer_intersection_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], tbuffer_l_intersection_lymph_count_cell);
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_intersectionbuffer_area_' num2str(lymph_cluster_size) '_' num2str(buffer_size) '.csv'], tbuffer_l_intersection_area_cell);
+    csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_centroidbuffer_in_count' '_l' num2str(lymph_cluster_size) '_b' num2str(buffer_size) '.csv'], tbuffer_l_centroid_count_cell);
+    
+    
+    
+%%end % for debug
 
 
 

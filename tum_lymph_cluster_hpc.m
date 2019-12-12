@@ -16,44 +16,44 @@
 
 
 %% this is for debugging purpose
-image_list= [626172, 597786];
+% image_list= [626172, 597786];
 % [603922];
 
-for image = 1:size(image_list,2)
-    image_filenumber = image_list(image);
-    
-    image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-    
-    data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
-    image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
-    
-    
+% % % % % % % for image = 1:size(image_list,2)
+% % % % % % %     image_filenumber = image_list(image);
+% % % % % % %     
+% % % % % % %     image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+% % % % % % %     
+% % % % % % %     data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
+% % % % % % %     image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+% % % % % % %     
+% % % % % % %     
     
     %% load images and fits files
     
-    % % % % % % % % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-    % % % % % % % % disp(image_filenumber_fullpath)
-    % % % % % % % % disp(class(image_filenumber_fullpath))
-    % % % % % % % % if ischar(image_filenumber_fullpath)
-    % % % % % % % %     [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-    % % % % % % % %     image_filenumber = str2num(image_filenumber);
-    % % % % % % % %     if isempty(image_path_stem)
-    % % % % % % % %         image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-    % % % % % % % %         warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-    % % % % % % % %     end
-    % % % % % % % % elseif isnumeric(image_filenumber_fullpath)
-    % % % % % % % %     image_filenumber = image_filenumber_fullpath;
-    % % % % % % % %     image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-    % % % % % % % %     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-    % % % % % % % % end
-    % % % % % % % %
-    % % % % % % % % % loading files
-    % % % % % % % % %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-    % % % % % % % % %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-    % % % % % % % % %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-    % % % % % % % % %
-    % % % % % % % % data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-    % % % % % % % % image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+    function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+    disp(image_filenumber_fullpath)
+    disp(class(image_filenumber_fullpath))
+    if ischar(image_filenumber_fullpath)
+        [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+        image_filenumber = str2num(image_filenumber);
+        if isempty(image_path_stem)
+            image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+            warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+        end
+    elseif isnumeric(image_filenumber_fullpath)
+        image_filenumber = image_filenumber_fullpath;
+        image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+        warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+    end
+    
+    % loading files
+    %data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+    %info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+    %image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    %
+    data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+    image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
     
     %%%%%%%%%%%%%%%% comment from function to here for debugging
     
@@ -80,10 +80,7 @@ for image = 1:size(image_list,2)
     data_trimmed = data.data_mini;
     data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
     
-    %remove non cells
-    %remove overlaps
-    %%remove low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush)
-    % and combine tumour and normal
+    %removed non cells, overlaps, low signal to noise ratio (set threshold at 1.3 - discussed with A Dariush) and combine tumour and normal
     
     %% Create a boundary around each core
     %xxxx run this next
@@ -465,39 +462,7 @@ for image = 1:size(image_list,2)
     tumour_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_tumour_cluster_boundary))); %In case you need this later
     % %this_tumour_cluster_boundary = this_tumour_cluster_boundary(~cellfun('isempty',this_tumour_cluster_boundary));
     lymphocyte_core_list = intersect(core_list, total_core_polygon(~cellfun('isempty',this_lymphocyte_cluster_boundary))); %In case you need this later
-    % %this_lymphocyte_cluster_boundary = this_lymphocyte_cluster_boundary(~cellfun('isempty',this_lymphocyte_cluster_boundary));
-    %
-    % for i =1:size(this_tumour_cluster_boundary,2)
-    %     for j = 1:size(this_tumour_cluster_boundary{i}, 2)
-    %         try
-    %             warning('off','all')
-    %             tumour_polygon{i}{j} = polyshape(this_tumour_cluster_boundary{i}{j});
-    %             warning('on','all')
-    %         catch
-    %             warning('on','all')
-    %             warning(['Something went wrong with tumour polygons for core ' num2str(tumour_core_list(i)) ' moving on, the array is:'])
-    %             disp(this_tumour_cluster_boundary{i}{j})
-    %             continue
-    %         end
-    %         %plot(tumour_polygon{i}{j});
-    %     end
-    % end
-    %
-    % for i =1:size(this_lymphocyte_cluster_boundary,2)
-    %     for j = 1:size(this_lymphocyte_cluster_boundary{i}, 2)
-    %         try
-    %             warning('off','all')
-    %             lymphocyte_polygon{i}{j} = polyshape(this_lymphocyte_cluster_boundary{i}{j});
-    %             warning('on','all')
-    %         catch
-    %             warning('on','all')
-    %             warning(['Something went wrong with lymphocyte polygons for core ' num2str(lymphocyte_core_list(i)) ' moving on, the array is:'])
-    %             disp(this_lymphocyte_cluster_boundary{i}{j})
-    %             continue
-    %         end
-    %         %plot(lymphocyte_polygon{i}{j});
-    %     end
-    % end
+    
     
     %the end result is tumour_polygon, and lymphocyte_polygon
     

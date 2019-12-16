@@ -52,7 +52,7 @@ elseif isnumeric(image_filenumber_fullpath)
     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
 end
 
-loading files
+%%%loading files
 data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
 info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
 image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];

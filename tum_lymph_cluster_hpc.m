@@ -53,12 +53,12 @@ elseif isnumeric(image_filenumber_fullpath)
 end
 
 %%%loading files
-data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+% % % data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+% % % info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+% % % image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 % %
-% %     data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-% %     image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+    data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+    image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %%%%%%%%%%%%%%%% comment from function to here for debugging
 

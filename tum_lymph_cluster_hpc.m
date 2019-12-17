@@ -17,18 +17,18 @@
 
 % % % % % %% this is for debugging purpose
 % % % % % % % % % % image_list= [593987];
-% % % % % % % % % % 
-% % % % % % % % % % 
+% % % % % % % % % %
+% % % % % % % % % %
 % % % % % % % % % % %[593971, 594006, 602915, 602942, 602976, 602994, 603253, 603269, 603271, 603283, 603298];
-% % % % % % % % % % 
+% % % % % % % % % %
 % % % % % % % % % % % repeat: 593960,
 % % % % % % % % % % % [603922, 626172,597786,594110,  ];
-% % % % % % % % % % 
+% % % % % % % % % %
 % % % % % % % % % % for image = 1:size(image_list,2)
 % % % % % % % % % %     image_filenumber = image_list(image);
-% % % % % % % % % % 
+% % % % % % % % % %
 % % % % % % % % % %     image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-% % % % % % % % % % 
+% % % % % % % % % %
 % % % % % % % % % %     data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
 % % % % % % % % % %     image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
@@ -57,8 +57,8 @@ end
 % % % info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
 % % % image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
 % %
-    data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-    image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %%%%%%%%%%%%%%%% comment from function to here for debugging
 
@@ -580,7 +580,7 @@ for i = 1:size(tumour_polygon_in, 2)
     
     tumour_polygon_in2{i} = tumour_polygon_in{i}(~cellfun('isempty', tumour_polygon_in{i}));
     tumour_buffer_in2{i} = tumour_buffer_in{i}(~cellfun('isempty', tumour_buffer_in{i}));
- 
+    
 end
 
 

@@ -16,49 +16,49 @@
 
 
 % % % % % %% this is for debugging purpose
-% % % % % % % % % % image_list= [593987];
-% % % % % % % % % %
-% % % % % % % % % %
-% % % % % % % % % % %[593971, 594006, 602915, 602942, 602976, 602994, 603253, 603269, 603271, 603283, 603298];
-% % % % % % % % % %
-% % % % % % % % % % % repeat: 593960,
-% % % % % % % % % % % [603922, 626172,597786,594110,  ];
-% % % % % % % % % %
-% % % % % % % % % % for image = 1:size(image_list,2)
-% % % % % % % % % %     image_filenumber = image_list(image);
-% % % % % % % % % %
-% % % % % % % % % %     image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-% % % % % % % % % %
-% % % % % % % % % %     data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
-% % % % % % % % % %     image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+image_list= [626172];
+
+
+%[593971, 594006, 602915, 602942, 602976, 602994, 603253, 603269, 603271, 603283, 603298];
+
+% repeat: 593960,
+% [603922, 626172,597786,594110,  ];
+
+for image = 1:size(image_list,2)
+    image_filenumber = image_list(image);
+
+    image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+
+    data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
+    image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
 
 
 
 %% load images and fits files
 
-function tum_lymph_cluster_hpc(image_filenumber_fullpath)
-disp(image_filenumber_fullpath)
-disp(class(image_filenumber_fullpath))
-if ischar(image_filenumber_fullpath)
-    [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
-    image_filenumber = str2num(image_filenumber);
-    if isempty(image_path_stem)
-        image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-        warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-    end
-elseif isnumeric(image_filenumber_fullpath)
-    image_filenumber = image_filenumber_fullpath;
-    image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
-    warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
-end
-
-%%%loading files
-% % % data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
-% % % info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
-% % % image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
-% %
-data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
-image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
+% % % % % % % % function tum_lymph_cluster_hpc(image_filenumber_fullpath)
+% % % % % % % % disp(image_filenumber_fullpath)
+% % % % % % % % disp(class(image_filenumber_fullpath))
+% % % % % % % % if ischar(image_filenumber_fullpath)
+% % % % % % % %     [image_path_stem,image_filenumber,~] = fileparts(image_filenumber_fullpath)
+% % % % % % % %     image_filenumber = str2num(image_filenumber);
+% % % % % % % %     if isempty(image_path_stem)
+% % % % % % % %         image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% % % % % % % %         warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% % % % % % % %     end
+% % % % % % % % elseif isnumeric(image_filenumber_fullpath)
+% % % % % % % %     image_filenumber = image_filenumber_fullpath;
+% % % % % % % %     image_path_stem = '/rds-d4/user/ww234/hpc-work/itpt'
+% % % % % % % %     warning('The input did not give a full path so assuming the data are in /rds-d4/user/ww234/hpc-work/itpt')
+% % % % % % % % end
+% % % % % % % % 
+% % % % % % % % %%%loading files
+% % % % % % % % % % % data = fitsread(['./IT_PT_zone/' num2str(image_filenumber) '.fits'],'binarytable');
+% % % % % % % % % % % info = fitsinfo(['./IT_PT_zone/' num2str(image_filenumber) '.fits']);
+% % % % % % % % % % % image_path = ['./IT_PT_zone/' num2str(image_filenumber) '.svs'];
+% % % % % % % % % %
+% % % % % % % % data= load([image_path_stem '/' num2str(image_filenumber) '.mat']);
+% % % % % % % % image_path = [image_path_stem '/' num2str(image_filenumber) '.svs'];
 
 %%%%%%%%%%%%%%%% comment from function to here for debugging
 
@@ -167,6 +167,9 @@ for i = 1:size(core_polygon, 2)
 end
 
 save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
+
+
+
 
 %% clear and reload workspace for subsequent work
 
@@ -843,7 +846,7 @@ for i = 1:size(lymphocyte_polygon, 2)
         lymph_lymphcluster{i}{l} = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), lymphocyte_polygon{i}{l}.Vertices(:,1), lymphocyte_polygon{i}{l}.Vertices(:,2));
         lymph_lymphcluster_count{i}{l} = sum(lymph_lymphcluster{i}{l});
         tumour_lymphcluster{i}{l} = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==1), in_core{i}{Y_ind}(in_core{i}{cell_ind}==1), lymphocyte_polygon{i}{l}.Vertices(:,1), lymphocyte_polygon{i}{l}.Vertices(:,2));
-        tumour_lymphcluster_count{i}{l} = sum(lymph_lymphcluster{i}{l});
+        tumour_lymphcluster_count{i}{l} = sum(tumour_lymphcluster{i}{l});
     end
     
 end

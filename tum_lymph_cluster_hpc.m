@@ -839,8 +839,8 @@ for i = 1:size(lymphocyte_polygon, 2)
     
     for l = 1:size(lymphocyte_polygon{i},2)
         if isempty(lymphocyte_polygon{i}{l})
-            lymph_lymphcluster_count{i}{j} = [];
-            tumour_lymphcluster_count{i}{j} = [];
+            lymph_lymphcluster_count{i}{l} = [];
+            tumour_lymphcluster_count{i}{l} = [];
             continue
         end
         lymph_lymphcluster{i}{l} = inpolygon(in_core{i}{X_ind}(in_core{i}{cell_ind}==2), in_core{i}{Y_ind}(in_core{i}{cell_ind}==2), lymphocyte_polygon{i}{l}.Vertices(:,1), lymphocyte_polygon{i}{l}.Vertices(:,2));

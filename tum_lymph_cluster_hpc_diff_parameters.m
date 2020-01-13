@@ -169,7 +169,7 @@ data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
 %save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
 
 
-load(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
+load(['../outputfiles_tum_lymph5/' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
 
 %re-change the parameters
 cluster_size = [5];

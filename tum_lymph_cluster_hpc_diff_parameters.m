@@ -69,8 +69,8 @@ mkdir(num2str(image_filenumber))
 
 % set parameters **** this needs changing again later on*****
 cluster_size = [5];
-lymph_cluster_size = [5];
-buffer_size = 200;
+lymph_cluster_size = [20];
+buffer_size = 100;
 
 % and index
 X_ind = 1;
@@ -173,8 +173,8 @@ load(['../workspace/' num2str(image_filenumber) '_workspace1.mat']);
 
 %re-change the parameters
 cluster_size = [5];
-lymph_cluster_size = [5];
-buffer_size = 200;
+lymph_cluster_size = [20];
+buffer_size = 100;
 
 
 

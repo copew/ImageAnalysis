@@ -16,7 +16,7 @@
 
 
 % % % % % %% this is for debugging purpose
-image_list=[593987];
+image_list=[603919,	607166,	619837,	619942,	625333,	625887,	625936,	625951,	626047];
 %[626172, 597786];
 
 
@@ -70,7 +70,7 @@ mkdir(num2str(image_filenumber))
 
 % set parameters
 cluster_size = [5];
-lymph_cluster_size = [5];
+lymph_cluster_size = [20];
 buffer_size = 100;
 
 % and index
@@ -91,94 +91,101 @@ data_trimmed = num2cell(data_trimmed, 1); %so that the cell index works later on
 %% Create a boundary around each core
 
 % First get the thumbnail
-image_info=imfinfo(image_path);
-thumbnail_height_scale_factor = image_info(1).Height/image_info(2).Height;
-thumbnail_width_scale_factor = image_info(1).Width/image_info(2).Width;
-thumbnail_overall_scale_factor = mean([thumbnail_height_scale_factor,thumbnail_width_scale_factor]);
-low_res_layer = length(image_info)-2;
-high_res_layer = 1;
-thumbnail_layer = 2;
-%By convention:
-% First level	Full resolution image
-% Second level	Thumbnail
-% Third level to N-2 Level	A reduction by a power of 2 (4:1 ratio, 16:1 ratio, 32:1 ratio, etc)
-% N-1 Level	Slide Label
-% N Level	Entire Slide with cropped region delineated in green
-%image_io=imread(image_path,'Index',low_res_layer);
+% % % % % % % % % % image_info=imfinfo(image_path);
+% % % % % % % % % % thumbnail_height_scale_factor = image_info(1).Height/image_info(2).Height;
+% % % % % % % % % % thumbnail_width_scale_factor = image_info(1).Width/image_info(2).Width;
+% % % % % % % % % % thumbnail_overall_scale_factor = mean([thumbnail_height_scale_factor,thumbnail_width_scale_factor]);
+% % % % % % % % % % low_res_layer = length(image_info)-2;
+% % % % % % % % % % high_res_layer = 1;
+% % % % % % % % % % thumbnail_layer = 2;
+% % % % % % % % % % %By convention:
+% % % % % % % % % % % First level	Full resolution image
+% % % % % % % % % % % Second level	Thumbnail
+% % % % % % % % % % % Third level to N-2 Level	A reduction by a power of 2 (4:1 ratio, 16:1 ratio, 32:1 ratio, etc)
+% % % % % % % % % % % N-1 Level	Slide Label
+% % % % % % % % % % % N Level	Entire Slide with cropped region delineated in green
+% % % % % % % % % % %image_io=imread(image_path,'Index',low_res_layer);
+% % % % % % % % % % 
+% % % % % % % % % % thumbnail_io=imread(image_path,'Index',thumbnail_layer);
+% % % % % % % % % % large_thumbnail_io = imresize(thumbnail_io,thumbnail_overall_scale_factor);
+% % % % % % % % % % 
+% % % % % % % % % % %now try to convert to bw and then create boundary
+% % % % % % % % % % this_image = imbinarize(large_thumbnail_io); % Binarize the image on all three colour layers
+% % % % % % % % % % this_image_2 = any(~this_image,3); % Select positive pixels in any colour layer
+% % % % % % % % % % this_image_expanded = bwdist(this_image_2) <= 100; % Expand the image to allow 'almost connected' cells
+% % % % % % % % % % cc = bwconncomp(this_image_expanded,4); % Now work out connected clusters
+% % % % % % % % % % big_cluster = false(1,cc.NumObjects); % This bit rejects 'crud' outside of large areas
+% % % % % % % % % % for i = 1:cc.NumObjects
+% % % % % % % % % %     big_cluster(i) = size(cc.PixelIdxList{i},1) > 1000000; % Absolute value for quick first pass, need to improve this for applicability XXXFIXME
+% % % % % % % % % % end
+% % % % % % % % % % grain = cell(0);
+% % % % % % % % % % for i = 1:cc.NumObjects
+% % % % % % % % % %     if big_cluster(i)
+% % % % % % % % % %         grain{end+1} = false(size(this_image_2));
+% % % % % % % % % %         grain{end}(cc.PixelIdxList{i}) = true; % Now create logical images of each core
+% % % % % % % % % %     end
+% % % % % % % % % % end
+% % % % % % % % % % this_boundary = cell(size(grain));
+% % % % % % % % % % for i = 1:size(grain,2)
+% % % % % % % % % %     clear row col % Now for each core work out a starting point for boundary determination
+% % % % % % % % % %     for j = 1:size(grain{i},2)
+% % % % % % % % % %         row = min(find(grain{i}(:,j)));
+% % % % % % % % % %         if row
+% % % % % % % % % %             break
+% % % % % % % % % %         end
+% % % % % % % % % %     end
+% % % % % % % % % %     col = j;
+% % % % % % % % % %     this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
+% % % % % % % % % % end
+% % % % % % % % % % 
+% % % % % % % % % % %     figure % Plot the results for sanity
+% % % % % % % % % % %     imshow(large_thumbnail_io)
+% % % % % % % % % % %     hold on;
+% % % % % % % % % % %
+% % % % % % % % % % %     %for i = 1:size(grain,2)
+% % % % % % % % % % %         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
+% % % % % % % % % % %     %end
+% % % % % % % % % % 
+% % % % % % % % % % % Now convert each into a polygon
+% % % % % % % % % % core_polygon= cell(0);
+% % % % % % % % % % for i = 1:size(this_boundary, 2)
+% % % % % % % % % %     core_polygon{i} = polyshape (this_boundary{i}(:,2),this_boundary{i}(:,1)); %note the doordinate is this way round
+% % % % % % % % % %     %plot(core_polygon{i}); %in case the coordinates flipped
+% % % % % % % % % % end
+% % % % % % % % % % 
+% % % % % % % % % % 
+% % % % % % % % % % % the useful output of this chunck is the core_polygon cell array
+% % % % % % % % % % 
+% % % % % % % % % % %% now subset coordinates of cells
+% % % % % % % % % % in_polygon=cell(0);
+% % % % % % % % % % in_core=cell(0);
+% % % % % % % % % % 
+% % % % % % % % % % for i = 1:size(core_polygon, 2)
+% % % % % % % % % %     in_polygon{i} = inpolygon(data_trimmed{X_ind}, data_trimmed{Y_ind}, core_polygon{i}.Vertices(:,1), core_polygon{i}.Vertices(:,2));
+% % % % % % % % % %     for j = 1:size(data_trimmed, 2)
+% % % % % % % % % %         in_core{i}{j} = data_trimmed{j}(in_polygon{i}, :);
+% % % % % % % % % %     end
+% % % % % % % % % % end
+% % % % % % % % % % 
+% % % % % % % % % % save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
 
-thumbnail_io=imread(image_path,'Index',thumbnail_layer);
-large_thumbnail_io = imresize(thumbnail_io,thumbnail_overall_scale_factor);
+load(['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/tum_lymph_overlap/workspace1/'  num2str(image_filenumber) '_workspace1.mat']);
 
-%now try to convert to bw and then create boundary
-this_image = imbinarize(large_thumbnail_io); % Binarize the image on all three colour layers
-this_image_2 = any(~this_image,3); % Select positive pixels in any colour layer
-this_image_expanded = bwdist(this_image_2) <= 100; % Expand the image to allow 'almost connected' cells
-cc = bwconncomp(this_image_expanded,4); % Now work out connected clusters
-big_cluster = false(1,cc.NumObjects); % This bit rejects 'crud' outside of large areas
-for i = 1:cc.NumObjects
-    big_cluster(i) = size(cc.PixelIdxList{i},1) > 1000000; % Absolute value for quick first pass, need to improve this for applicability XXXFIXME
-end
-grain = cell(0);
-for i = 1:cc.NumObjects
-    if big_cluster(i)
-        grain{end+1} = false(size(this_image_2));
-        grain{end}(cc.PixelIdxList{i}) = true; % Now create logical images of each core
-    end
-end
-this_boundary = cell(size(grain));
-for i = 1:size(grain,2)
-    clear row col % Now for each core work out a starting point for boundary determination
-    for j = 1:size(grain{i},2)
-        row = min(find(grain{i}(:,j)));
-        if row
-            break
-        end
-    end
-    col = j;
-    this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
-end
+cluster_size = [5];
+lymph_cluster_size = [20];
+buffer_size = 100;
 
-%     figure % Plot the results for sanity
-%     imshow(large_thumbnail_io)
-%     hold on;
-%
-%     %for i = 1:size(grain,2)
-%         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
-%     %end
-
-% Now convert each into a polygon
-core_polygon= cell(0);
-for i = 1:size(this_boundary, 2)
-    core_polygon{i} = polyshape (this_boundary{i}(:,2),this_boundary{i}(:,1)); %note the doordinate is this way round
-    %plot(core_polygon{i}); %in case the coordinates flipped
-end
-
-
-% the useful output of this chunck is the core_polygon cell array
-
-%% now subset coordinates of cells
-in_polygon=cell(0);
-in_core=cell(0);
-
-for i = 1:size(core_polygon, 2)
-    in_polygon{i} = inpolygon(data_trimmed{X_ind}, data_trimmed{Y_ind}, core_polygon{i}.Vertices(:,1), core_polygon{i}.Vertices(:,2));
-    for j = 1:size(data_trimmed, 2)
-        in_core{i}{j} = data_trimmed{j}(in_polygon{i}, :);
-    end
-end
-
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
 
 %% clear and reload workspace for subsequent work
 
 % for final code, change reload workspace to =0 to skip this step (true or 1, false or 0)
-reload_workspace = 0;
-if reload_workspace
-    save('image_filenumber','image_filenumber');
-    clear variables;
-    load('image_filenumber');
-    load(['./' num2str(image_filenumber) '/workspace.mat']);
-end
+% % % % % % % % % % reload_workspace = 0;
+% % % % % % % % % % if reload_workspace
+% % % % % % % % % %     save('image_filenumber','image_filenumber');
+% % % % % % % % % %     clear variables;
+% % % % % % % % % %     load('image_filenumber');
+% % % % % % % % % %     load(['./' num2str(image_filenumber) '/workspace.mat']);
+% % % % % % % % % % end
 
 
 %% Now compute the tumour and lymphocyte clusters with subsetting

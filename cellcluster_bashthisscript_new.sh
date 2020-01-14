@@ -12,8 +12,8 @@ func=${myscriptdir}/tum_lymph_cluster_hpc_diff_parameters.m
 #!images=${myscriptdir}/testfiles.txt #! For debug
 images=${myscriptdir}/largefiles.txt #! for the two large files that often get left out
 
-mkdir outputfiles_tum_lymph6
-cd outputfiles_tum_lymph6
+mkdir outputfiles_tum_lymph7
+cd outputfiles_tum_lymph7
 while read line ; do sbatch ${submit} ${prepare} ${func} "${myfilesdir}/${line}.fits" ; done<${images}
 while read line ; do echo ${submit} ${prepare} ${func} "${myfilesdir}/${line}.fits" ; done<${images} #!For debug
 

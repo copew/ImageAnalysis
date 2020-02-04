@@ -52,10 +52,12 @@ for image = 1:size(image_list,2)
         if isa(data_trimmed{j}, 'double')
             continue
         elseif isa(data_trimmed{j}, 'char')
-            data_trimmed{j} = double(data_trimmed{j});
+            data_trimmed{j} = double(data_trimmed{j}); %now 'T' is 84 and 'F' is 70
+            data_trimmed{j}(data_trimmed{j} == 84) = 1; %now 'T' is 1
+            data_trimmed{j}(data_trimmed{j} == 70) = 0; % now 'F' is 0
         else
              data_trimmed{j} = cell2mat(data_trimmed{j});
-             data_trimmed{j} = double(data_trimmed{j});
+             data_trimmed{j} = str2num(data_trimmed{j});
         end
         
     end

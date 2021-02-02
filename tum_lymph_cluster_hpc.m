@@ -16,7 +16,7 @@
 
 
 % % % % % %% this is for debugging purpose
-image_list= [626172];
+image_list= [603288]; %%%626172];
 
 
 %[593971, 594006, 602915, 602942, 602976, 602994, 603253, 603269, 603271, 603283, 603298];
@@ -27,10 +27,10 @@ image_list= [626172];
 for image = 1:size(image_list,2)
     image_filenumber = image_list(image);
 
-    image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
-
-    data = load([image_path_stem '/mat_file_new/' num2str(image_filenumber) '.mat']);
-    image_path = [image_path_stem '/IT_PT_zone/' num2str(image_filenumber) '.svs'];
+    %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis';
+    %image_path_stem = '/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/IT_PT_zone/603288.svs'
+    data = load("/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/MATLAB/ImageAnalysis/mat_file_new/603288.mat");
+    image_path = ['/Users/cope01/Documents/OneDrive - University Of Cambridge/Documents/PhD/Neoadjuvant/IT_PT_zone/603288.svs'];
 
 
 
@@ -63,21 +63,21 @@ for image = 1:size(image_list,2)
 %%%%%%%%%%%%%%%% comment from function to here for debugging
 
 % make a folder to save files
-mkdir(num2str(image_filenumber))
+%mkdir(num2str(image_filenumber))
 
 %% set parameters and index
 
 % set parameters
-cluster_size = [5];
-lymph_cluster_size = [5];
-buffer_size = 100;
+%cluster_size = [5];
+%lymph_cluster_size = [5];
+%buffer_size = 100;
 
 % and index
 X_ind = 1;
 Y_ind = 2;
 cell_ind = 3;
-% overlap = 22;
-% s2n=61;
+overlap = 22;
+s2n=61;
 
 %% tidying up data
 
@@ -137,14 +137,22 @@ for i = 1:size(grain,2)
     this_boundary{i} = bwtraceboundary(grain{i},[row col],'S'); % Trace the boundary
 end
 
-%     figure % Plot the results for sanity
-%     imshow(large_thumbnail_io)
-%     hold on;
-%
-%     %for i = 1:size(grain,2)
-%         plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
-%     %end
+    figure % Plot the results for sanity
+    imshow(large_thumbnail_io)
+    hold on;
 
+    for i = 1:size(grain,2)
+        plot(this_boundary{i}(:,2),this_boundary{i}(:,1),'g','LineWidth',1);
+    end
+end
+
+
+
+
+
+
+
+%%
 % Now convert each into a polygon
 core_polygon= cell(0);
 for i = 1:size(this_boundary, 2)
@@ -166,21 +174,21 @@ for i = 1:size(core_polygon, 2)
     end
 end
 
-save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
+%save(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_workspace1.mat']);
 
 
 
 
 %% clear and reload workspace for subsequent work
-
-% for final code, change reload workspace to =0 to skip this step (true or 1, false or 0)
-reload_workspace = 0;
-if reload_workspace
-    save('image_filenumber','image_filenumber');
-    clear variables;
-    load('image_filenumber');
-    load(['./' num2str(image_filenumber) '/workspace.mat']);
-end
+% 
+% % for final code, change reload workspace to =0 to skip this step (true or 1, false or 0)
+% reload_workspace = 0;
+% if reload_workspace
+%     save('image_filenumber','image_filenumber');
+%     clear variables;
+%     load('image_filenumber');
+%     load(['./' num2str(image_filenumber) '/workspace.mat']);
+% end
 
 
 %% Now compute the tumour and lymphocyte clusters with subsetting
@@ -433,7 +441,7 @@ for i =1:size(core_list, 2)
             continue
         end
         tumour_polygon{core_list(i)}{j} = polyshape (this_tumour_cluster_boundary{core_list(i)}{j});
-        %plot(tumour_polygon{core_list(i)}{j});
+        plot(tumour_polygon{core_list(i)}{j});
     end
 end
 
@@ -874,4 +882,4 @@ csvwrite(['./' num2str(image_filenumber) '/' num2str(image_filenumber) '_tumour_
 % % clear all
 % % load('image_list')
 
-end
+
